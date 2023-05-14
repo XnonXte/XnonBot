@@ -14,7 +14,7 @@ def get_quote():
   return quote
 
 
-def get_doc_pic():
+def get_dog_pic():
   dog_response = requests.get("https://dog.ceo/api/breeds/image/random")
   dog_convert_json = json.loads(dog_response.text)
   dog_pic = dog_convert_json[

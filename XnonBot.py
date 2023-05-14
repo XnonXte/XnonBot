@@ -75,7 +75,7 @@ async def on_message(message):
     await msgchn.send(random.randint(1, 6))
 
   if msgcnt.startswith(".dog"):
-    dog_pic = bot_requests.get_doc_pic()
+    dog_pic = bot_requests.get_dog_pic()
     await msgchn.send(dog_pic)
 
   if msgcnt.startswith(".cat"):
