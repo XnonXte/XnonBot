@@ -3,8 +3,10 @@ import discord
 import html
 import random
 import bot_requests
+import dotenv
+import os
 
-TOKEN = ""
+dotenv.load_dotenv("C:\Programming\XnonBot\dev.env")
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -173,4 +175,4 @@ async def on_message(message):
     say_output = msgcnt[5:]
     await msgchn.send(say_output)
 
-client.run(TOKEN)
+client.run(os.getenv("XNONBOTTOKEN"))
