@@ -9,4 +9,4 @@ Update 13/05/2023 - Releasing XnonBot Beta Version 0.1, added XnonBot sourcecode
 --------------------------------------------------
 
 Logo: https://cdn.discordapp.com/attachments/944147343140327465/1106659505711878154/xnonbot.png
-Hit me on discord if you want to contribute on this project!
+Hit me up on discord (XnonXte#2517) if you want to contribute on this project! 
