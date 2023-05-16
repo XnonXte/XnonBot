@@ -47,6 +47,7 @@ async def on_ready():
     except Exception as e:
         print(e)
 
+
 # bot.tree.command() decorator, we're using this instead of bot.command()
 @bot.tree.command(name="hello", description="Say hello to the user.")
 async def hello(interaction: discord.Interaction):
@@ -130,7 +131,6 @@ async def on_message(message):
     
     if message.content.startswith("$help"):
         await message.channel.send(command_dict)
-
 
     if message.content.startswith("$animaltrivia"):
         animal_trivia = BotHTTPRequests.get_animal_trivia()
