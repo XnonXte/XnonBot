@@ -1,8 +1,7 @@
 import requests
 import json
-import dotenv
 import os
-import pexels_api
+from pexels_api import API
 from dotenv import load_dotenv
 
 load_dotenv("C:\Programming\XnonBot\dev.env")
@@ -80,7 +79,7 @@ def get_anime_trivia():
 
 
 def get_pexels_photos(query):
-  pexels_client_api = pexels_api.API(os.getenv("PEXELSAPI"))
+  pexels_client_api = API(os.getenv("PEXELSAPI"))
   pexels_client_api.search(query, page=1, results_per_page=1)
   images = pexels_client_api.get_entries()
   for i in images:
