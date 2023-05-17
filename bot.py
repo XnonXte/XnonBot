@@ -1,20 +1,41 @@
-# XnonBot Version Beta 0.2
-# New and improved XnonBot source code written in Python, currently using discord.py 2.2.3
-# Utilizing discord.ext to use the Bot commands framework that discord has been integrating itself with
+# Option template for interactions.py
+    # name="COMMAND_NAME",
+    # description="DESCRIPTION",
+    # options=[
+    #     Option(
+    #     type=OptionType.TYPE,
+    #     name="OPTIONNAME",
+    #     description="OPTIONDESCRIPTION",
+    #     required=BOOL,
+    #     ),
+    # ],
 
-# Importing dependencies
-import discord
-import BotRequests
-import html
+# Button template for interactions.py
+        # style=ButtonStyle.TYPE,
+        # custom_id="IDHERE",
+        # label="LABELHERE",
+
+# Option template for interaction.py
+        # custom_id="IDHERE",
+        # options=[
+        #     SelectOption(label="Option 1", value="option-1"),
+        #     SelectOption(label="Option 2", value="option-2")
+        # ],
+        # placeholder="PLACEHOLDER",
+
+# XnonBot Version Beta 0.3
+import interactions
 import os
+import html
 import random
-from discord.ext import commands
+import BotRequests
 from dotenv import load_dotenv
+from interactions import Option, OptionType, CommandContext # Modules that we want
 
 load_dotenv("C:\Programming\XnonBot\dev.env")
-bot = commands.Bot(command_prefix="$", intents=discord.Intents.all())
+bot = interactions.Client(token=os.getenv("TESTINGBOTTOKEN"))
 
-slash_command_dict = """
+commands = """
 List of commands prompted using slash command: 
 
 `help` - Send a list of available slash commands
@@ -31,133 +52,132 @@ List of commands prompted using slash command:
 `pexels` - Search an image on pexels.com
 """
 
-command_dict = """
-List of commands prompted using ("$")
 
-`animaltrivia` - Send a random animal trivia and asking the user whether it's true or false
-`mathtrivia` - Send a random math trivia and asking the user whether it's true or false
-`animetrivia` - Send a random anime trivia and asking the user whether it's true or false
-"""
-
-
-# bot.event decorator
 @bot.event
 async def on_ready():
-  print(f"The bot is running as {bot.user.name}")
-  try:
-    synced = await bot.tree.sync(
-    )  # Syncs all available slash commands as it is a discord requirement
-    print(f"{len(synced)} command(s) synced!")
-  except Exception as e:
-    print(e)
+    print("The bot is up!")
 
 
-# bot.tree.command() decorator, we're using this instead of bot.command()
-@bot.tree.command(name="hello", description="Say hello to the user.")
-async def hello(interaction: discord.Interaction):
-  await interaction.response.send_message(f"Hello {interaction.user.mention}!")
+@bot.command(name="hello", description="Say hello to the user.")
+async def hello(ctx: CommandContext):
+    await ctx.send(f"Hello {ctx.user.mention}!")
 
 
-@bot.tree.command(name="help",
-                  description="Send a list of available slash commands.")
-async def help(interaction: discord.Interaction):
-  await interaction.response.send_message(slash_command_dict)
+@bot.command(name="help", description="Send a list of available slash commands.")
+async def help(ctx: CommandContext):
+    await ctx.send(commands)
 
 
-@bot.tree.command(name="say", description="Tell the bot to say something.")
-async def say(interaction: discord.Interaction, thing_to_say: str):
-  await interaction.response.send_message(
-    f"{interaction.user.mention} said: `{thing_to_say}`")
+@bot.command(
+      name="say",
+      description="Tell the bot to say something.",
+      options=[
+         Option(
+            type=OptionType.STRING,
+            name="message",
+            description="Message to send",
+            required=True,
+         ),
+      ],
+)
+async def say(ctx: CommandContext, message: str):
+    await ctx.send(f"{ctx.user.mention} said: `{message}`")
 
 
-@bot.tree.command(name="about",
-                  description="Send the information about this bot.")
-async def about(interaction: discord.Interaction):
-  await interaction.response.send_message(
-    "As the name implies, I'm a simple chatbot created by XnonXte!")
+@bot.command(name="about", description="Send the information about this bot.")
+async def about(ctx: CommandContext):
+    await ctx.send("As the name implies, I'm a simple chatbot created by XnonXte!")
 
 
-@bot.tree.command(name="roll",
-                  description="Choose a random dice roll (1 from 6).")
-async def roll(interaction: discord.Interaction):
-  await interaction.response.send_message(random.randint(1, 6))
+@bot.command(name="roll", description="Choose a random dice roll (1 to 6).")
+async def roll(ctx: CommandContext):
+    await ctx.send(random.randint(1, 6))
 
 
-@bot.tree.command(name="github",
-                  description="Send the github page for this bot.")
-async def github(interaction: discord.Interaction):
-  await interaction.response.send_message("https://github.com/XnonXte/XnonBot")
+@bot.command(name="github", description="Send the github page for this bot.")
+async def github(ctx: CommandContext):
+    await ctx.send("https://github.com/XnonXte/XnonBot")
 
 
-@bot.tree.command(name="quote",
-                  description="Get a random quote.")
-async def quote(interaction: discord.Interaction):
-  quote = BotRequests.get_quote()
-  await interaction.response.send_message(quote)
+@bot.command(name="quote", description="Get a random waifu picture.")
+async def quote(ctx: CommandContext):
+    quote = BotRequests.get_quote()
+    await ctx.send(quote)
 
 
-@bot.tree.command(name="dog",
-                  description="Get a random dog picture.")
-async def dog(interaction: discord.Interaction):
-  dog = BotRequests.get_dog_pic()
-  await interaction.response.send_message(dog)
+@bot.command(name="waifu", description="Get a random waifu picture.")
+async def waifu(ctx: CommandContext):
+    waifu = BotRequests.get_waifu_pic()
+    await ctx.send(waifu)
 
 
-@bot.tree.command(
-  name="cat", description="Get a random cat picture.")
-async def cat(interaction: discord.Interaction):
-  cat = BotRequests.get_cat_pic()
-  await interaction.response.send_message(cat)
+@bot.command(name="dog", description="Get a random waifu picture.")
+async def dog(ctx: CommandContext):
+    dog = BotRequests.get_dog_pic()
+    await ctx.send(dog)
 
 
-@bot.tree.command(
-  name="waifu",
-  description=
-  "Get a random waifu picture.")
-async def waifu(interaction: discord.Interaction):
-  waifu = BotRequests.get_waifu_pic()
-  await interaction.response.send_message(waifu)
+@bot.command(name="cat", description="Get a random waifu picture.")
+async def cat(ctx: CommandContext):
+    cat = BotRequests.get_cat_pic()
+    await ctx.send(cat)
+
+    
+@bot.command(
+    name="rps",
+    description="Play rock, paper, scissors with the user",
+    options=[
+        Option(
+        type=OptionType.STRING,
+        name="choice",
+        description="Input your choice (rock, paper, or scissors)",
+        required=True,
+        ),
+    ],
+)
+async def rps(ctx: CommandContext, choice: str):
+    choices = ("rock", "paper", "scissors")
+    bot_choice = random.choice(choices)
+
+    if choice not in choices:
+        await ctx.send(
+            'Invalid choice. Please choose either rock, paper, or scissors!',
+            ephemeral=True)
+        return
+
+    if choice == bot_choice:
+        await ctx.send(
+            f'{ctx.user.mention} chose {choice}. I chose {bot_choice}. We tied!')
+    elif choice == 'rock' and bot_choice == 'scissors':
+        await ctx.send(
+            f'{ctx.user.mention} chose {choice}. I chose {bot_choice}. {ctx.user.mention} won!')
+    elif choice == 'scissors' and bot_choice == 'paper':
+        await ctx.send(
+            f'{ctx.user.mention} chose {choice}. I chose {bot_choice}. {ctx.user.mention} won!')
+    elif choice == 'paper' and bot_choice == 'rock':
+        await ctx.send(
+            f'{ctx.user.mention} chose {choice}. I chose {bot_choice}. {ctx.user.mention} won!')
+    else:
+        await ctx.send(
+            f'{ctx.user.mention} chose {choice}. I chose {bot_choice}. I won!')
 
 
-@bot.tree.command(name="rps",
-                  description="Play rock, paper, scissors with the bot.")
-async def rps(interaction: discord.Interaction, choice: str):
-  choices = ("rock", "paper", "scissors")
-  bot_choice = random.choice(choices)
-
-  if choice not in choices:
-    await interaction.response.send_message(
-      'Invalid choice. Please choose either rock, paper, or scissors!',
-      ephemeral=True)
-    return
-
-  if choice == bot_choice:
-    await interaction.response.send_message(
-      f'{interaction.user.mention} chose {choice}. I chose {bot_choice}. We tied!'
-    )
-  elif choice == 'rock' and bot_choice == 'scissors':
-    await interaction.response.send_message(
-      f'{interaction.user.mention} chose {choice}. I chose {bot_choice}. {interaction.user.mention} won!'
-    )
-  elif choice == 'scissors' and bot_choice == 'paper':
-    await interaction.response.send_message(
-      f'{interaction.user.mention} chose {choice}. I chose {bot_choice}. {interaction.user.mention} won!'
-    )
-  elif choice == 'paper' and bot_choice == 'rock':
-    await interaction.response.send_message(
-      f'{interaction.user.mention} chose {choice}. I chose {bot_choice}. {interaction.user.mention} won!'
-    )
-  else:
-    await interaction.response.send_message(
-      f'{interaction.user.mention} chose {choice}. I chose {bot_choice}. I won!'
-    )
-
-
-@bot.tree.command(name="pexels", description="Search an image on pexels.com")
-async def pexels(interaction: discord.Interaction, query: str):
-  image_output = BotRequests.get_pexels_photos(query)
-  await interaction.response.send_message(
-    f"An image of {query} has been generated! Photographed by: {image_output[0]}, original link: {image_output[2]} - Powered by pexels.com"
+@bot.command(
+    name="pexels",
+    description="Search an image on pexels.com",
+    options=[
+        Option(
+        type=OptionType.STRING,
+        name="search_query",
+        description="Image to search",
+        required=True
+        )
+    ]
+)
+async def pexels(ctx: CommandContext, search_query: str):
+  image_output = BotRequests.get_pexels_photos(search_query)
+  await ctx.send(
+    f"An image of {search_query} has been generated! Photographed by: {image_output[0]}, original link: {image_output[2]} - Powered by pexels.com"
   )
 
 
@@ -169,7 +189,7 @@ async def on_message(message):
     ) in ["true", "false"]
 
   if message.content.startswith("$help"):
-    await message.channel.send(command_dict)
+    await message.channel.send(commands)
 
   if message.content.startswith("$animaltrivia"):
     animal_trivia = BotRequests.get_animal_trivia()
@@ -217,4 +237,6 @@ async def on_message(message):
         f"Sorry, but the correct answer was {anime_trivia[2]}.")
 
 
-bot.run(os.getenv("XNONBOTTOKEN"))
+bot.start()
+
+
