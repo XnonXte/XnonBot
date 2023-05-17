@@ -3,7 +3,7 @@
 import discord
 import html
 import random
-import BotHTTPRequests
+import BotRequests
 import os
 from dotenv import load_dotenv
 
@@ -76,23 +76,23 @@ async def on_message(message):
     await msgchn.send(random.randint(1, 6))
 
   if msgcnt.startswith(".dog"):
-    dog_pic = BotHTTPRequests.get_dog_pic()
+    dog_pic = BotRequests.get_dog_pic()
     await msgchn.send(dog_pic)
 
   if msgcnt.startswith(".cat"):
-    cat_pic = BotHTTPRequests.get_cat_pic()
+    cat_pic = BotRequests.get_cat_pic()
     await msgchn.send(cat_pic)
 
   if msgcnt.startswith(".inspire"):
-    quote = BotHTTPRequests.get_quote()
+    quote = BotRequests.get_quote()
     await msgchn.send(quote)
 
   if msgcnt.startswith(".waifu"):
-    waifu = BotHTTPRequests.get_waifu_pic()
+    waifu = BotRequests.get_waifu_pic()
     await msgchn.send(waifu)
 
   if msgcnt.startswith(".animaltrivia"):
-    animal_trivia = BotHTTPRequests.get_animal_trivia()
+    animal_trivia = BotRequests.get_animal_trivia()
     await msgchn.send(
       html.unescape(
         f"{animal_trivia[0]} True or false? The difficulty is {animal_trivia[1]}."
@@ -107,7 +107,7 @@ async def on_message(message):
         f"Sorry, but the correct answer was {animal_trivia[2]}.")
 
   if msgcnt.startswith(".mathtrivia"):
-    math_trivia = BotHTTPRequests.get_math_trivia()
+    math_trivia = BotRequests.get_math_trivia()
     await msgchn.send(html.unescape(f"{math_trivia[0]} True or false? The difficulty is {math_trivia[1]}."))
 
     response = await client.wait_for("message", check=check_message)
@@ -118,7 +118,7 @@ async def on_message(message):
       await msgchn.send(f"Sorry, but the correct answer was {math_trivia[2]}.")
 
   if msgcnt.startswith(".animetrivia"):
-    anime_trivia = BotHTTPRequests.get_anime_trivia()
+    anime_trivia = BotRequests.get_anime_trivia()
     await msgchn.send(html.unescape(f"{anime_trivia[0]} True or false? The difficulty is {anime_trivia[1]}."))
 
     response = await client.wait_for("message", check=check_message)
@@ -135,7 +135,7 @@ async def on_message(message):
             await msgchn.send("Please input a query after the command .pexels!")
             return
         query = msgcnt[8:]
-        image_output = BotHTTPRequests.get_pexels_photos(query)
+        image_output = BotRequests.get_pexels_photos(query)
         await msgchn.send(image_output[2] + " Photographer: " + image_output[0] + " - Powered by pexels.com")
     except TypeError:
         await msgchn.send("The image you're searching doesn't exist! Please try again with a different keyword")
