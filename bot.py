@@ -23,7 +23,7 @@
         # ],
         # placeholder="PLACEHOLDER",
 
-# XnonBot Version Beta 0.3
+# XnonBot Version Beta Pre 0.3
 import interactions
 import os
 import html
