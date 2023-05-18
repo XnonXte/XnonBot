@@ -37,7 +37,18 @@ List of avalaible commands (prompted using </> command):
 @interactions.listen()
 async def on_startup():
     print(f"The bot is running as {bot.user}!")
-    print()
+    print(
+        """
+ __   __                  ____        _   
+ \ \ / /                 |  _ \      | |  
+  \ V / _ __   ___  _ __ | |_) | ___ | |_ 
+   > < | '_ \ / _ \| '_ \|  _ < / _ \| __|
+  / . \| | | | (_) | | | | |_) | (_) | |_ 
+ /_/ \_\_| |_|\___/|_| |_|____/ \___/ \__|
+                                          
+                                          
+""")
+    print("This bot is developed by XnonXte, refer to my GitHub for contact information. Enjoy using the bot!")
 
 
 @interactions.slash_command(name="hello", description="Say hello to the user.")
