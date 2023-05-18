@@ -1,14 +1,16 @@
 # XnonBot Version Beta 0.2.1
+# Currently written for interactions.py version 4 but it might be migrated to version 5 in the near future.
 import interactions
-import os
-import html
 import BotRequests
+import html
 import random
-from interactions import Option, OptionType, CommandContext, ComponentContext, Button, ButtonStyle, SelectMenu, SelectOption, ActionRow
+
+from interactions import Option, OptionType, CommandContext, ComponentContext, Button, ButtonStyle, ActionRow
 from dotenv import load_dotenv
+from os import getenv
 
 load_dotenv("C:\Programming\XnonBot\dev.env")
-token = os.getenv("XNONBOTTOKEN") # Token for XnonBot#8699 on discord
+token = getenv("XNONBOTTOKEN") # Token for XnonBot#8699 on discord
 bot = interactions.Client(token=token)
 
 correct_trivia_answer = None
@@ -166,7 +168,7 @@ async def pexels(ctx: CommandContext, search_query: str):
 async def animaltrivia(ctx: CommandContext):
     global correct_trivia_answer
     animal_trivia = BotRequests.get_animal_trivia()
-    await ctx.send(html.unescape(f"{animal_trivia[0]} | The difficulty is {animal_trivia[1]}"))
+    await ctx.send(html.unescape(f"{animal_trivia[0]} | The difficulty is {animal_trivia[1]}."))
     
     button = Button(
         style=ButtonStyle.PRIMARY,
@@ -179,7 +181,7 @@ async def animaltrivia(ctx: CommandContext):
         label="False",
     )
     action_row = ActionRow(components=[button, button2])
-    await ctx.send(f"Please choose an answer {ctx.user.mention}, on whether you think it is true or false.", components=action_row, ephemeral=True)
+    await ctx.send(f"Please choose an answer {ctx.user.mention}, on whether you think that is true or false.", components=action_row)
     correct_trivia_answer = animal_trivia[2] 
 
 
@@ -219,7 +221,7 @@ async def mathtrivia(ctx: CommandContext):
         label="False",
     )
     action_row = ActionRow(components=[button, button2])
-    await ctx.send(f"Please choose an answer {ctx.user.mention}, on whether you think it is true or false.", components=action_row, ephemeral=True)
+    await ctx.send(f"Please choose an answer {ctx.user.mention}, on whether you think that is true or false.", components=action_row, ephemeral=True)
     correct_trivia_answer = math_trivia[2] 
 
 
@@ -260,7 +262,7 @@ async def animetrivia(ctx: CommandContext):
         label="False",
     )
     action_row = ActionRow(components=[button, button2])
-    await ctx.send(f"Please choose an answer {ctx.user.mention}, on whether you think it is true or false.", components=action_row, ephemeral=True)
+    await ctx.send(f"Please choose an answer {ctx.user.mention}, on whether you think that is true or false.", components=action_row, ephemeral=True)
     correct_trivia_answer = anime_trivia[2] 
 
 
