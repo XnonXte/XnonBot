@@ -3,7 +3,7 @@
 import discord
 import html
 import random
-import bot_req
+import XnonBotModules.bot_req as bot_req
 import os
 from dotenv import load_dotenv
 

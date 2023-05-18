@@ -4,7 +4,7 @@
 
 # Importing dependencies
 import discord
-import bot_req
+import XnonBotModules.bot_req as bot_req
 import html
 import os
 import random
