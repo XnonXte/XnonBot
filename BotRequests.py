@@ -30,11 +30,20 @@ def get_cat_pic():
 
 
 def get_waifu_pic():
-  waifu_response = requests.get("https://api.waifu.pics/sfw/waifu")
+  waifu_response = requests.get         ("https://api.waifu.pics/sfw/waifu")
   waifu_convert_json = json.loads(waifu_response.text)
   waifu_pic = waifu_convert_json[
     "url"] + " random picture of waifu has been generated!"
   return waifu_pic
+
+
+# Warning that it is NSFW, I will not be putting this into my bot. 
+# def get_waifu_pic_nsfw():
+#   waifu_nsfw_response = requests.get("https://api.waifu.pics/nsfw/waifu")
+#   waifu_nsfw_convert_json = json.loads(waifu_nsfw_response.text)
+#   waifu_nsfw_pic= waifu_nsfw_convert_json[
+#     "url"] + " random picture of waifu has been generated!"
+#   return waifu_nsfw_pic
 
 
 def get_animal_trivia():

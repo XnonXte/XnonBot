@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from os import getenv
 
 load_dotenv("C:\Programming\XnonBot\dev.env")
-token = getenv("XNONBOTTOKEN") # Token for XnonBot#8699 on discord
+token = getenv("XNONBOTTOKEN")  # Token for XnonBot#8699 on discord
 bot = interactions.Client(token=token)
 
 correct_trivia_answer = None
@@ -163,13 +163,13 @@ async def pexels(ctx: CommandContext, search_query: str):
 
 @bot.command(
     name="animaltrivia",
-    description="Play a random animal trivia game.", 
+    description="Play a random animal trivia game.",
 )
 async def animaltrivia(ctx: CommandContext):
     global correct_trivia_answer
     animal_trivia = BotRequests.get_animal_trivia()
     await ctx.send(html.unescape(f"{animal_trivia[0]} | The difficulty is {animal_trivia[1]}."))
-    
+
     button = Button(
         style=ButtonStyle.PRIMARY,
         custom_id="animal_trivia_button_true",
@@ -182,11 +182,11 @@ async def animaltrivia(ctx: CommandContext):
     )
     action_row = ActionRow(components=[button, button2])
     await ctx.send(f"Please choose an answer {ctx.user.mention}, on whether you think that is true or false.", components=action_row)
-    correct_trivia_answer = animal_trivia[2] 
+    correct_trivia_answer = animal_trivia[2]
 
 
 @bot.component("animal_trivia_button_true")
-async def animal_trivia_button_true(ctx: ComponentContext):  
+async def animal_trivia_button_true(ctx: ComponentContext):
     if correct_trivia_answer.lower() == "true":
         await ctx.send(f"{ctx.user.mention} choose True, {ctx.user.mention} is correct!")
     else:
@@ -194,7 +194,7 @@ async def animal_trivia_button_true(ctx: ComponentContext):
 
 
 @bot.component("animal_trivia_button_false")
-async def animal_trivia_button_false(ctx: ComponentContext):  
+async def animal_trivia_button_false(ctx: ComponentContext):
     if correct_trivia_answer.lower() == "false":
         await ctx.send(f"{ctx.user.mention} choose False, {ctx.user.mention} is correct!")
     else:
@@ -203,13 +203,13 @@ async def animal_trivia_button_false(ctx: ComponentContext):
 
 @bot.command(
     name="mathtrivia",
-    description="Play a random math trivia game.", 
+    description="Play a random math trivia game.",
 )
 async def mathtrivia(ctx: CommandContext):
     global correct_trivia_answer
     math_trivia = BotRequests.get_math_trivia()
     await ctx.send(html.unescape(f"{math_trivia[0]} | The difficulty is {math_trivia[1]}."))
-    
+
     button = Button(
         style=ButtonStyle.PRIMARY,
         custom_id="math_trivia_button_true",
@@ -222,11 +222,11 @@ async def mathtrivia(ctx: CommandContext):
     )
     action_row = ActionRow(components=[button, button2])
     await ctx.send(f"Please choose an answer {ctx.user.mention}, on whether you think that is true or false.", components=action_row, ephemeral=True)
-    correct_trivia_answer = math_trivia[2] 
+    correct_trivia_answer = math_trivia[2]
 
 
 @bot.component("math_trivia_button_true")
-async def math_trivia_button_true(ctx: ComponentContext):  
+async def math_trivia_button_true(ctx: ComponentContext):
     if correct_trivia_answer.lower() == "true":
         await ctx.send(f"{ctx.user.mention} choose True, {ctx.user.mention} is correct!")
     else:
@@ -234,7 +234,7 @@ async def math_trivia_button_true(ctx: ComponentContext):
 
 
 @bot.component("math_trivia_button_false")
-async def math_trivia_button_false(ctx: ComponentContext):  
+async def math_trivia_button_false(ctx: ComponentContext):
     if correct_trivia_answer.lower() == "false":
         await ctx.send(f"{ctx.user.mention} choose False, {ctx.user.mention} is correct!")
     else:
@@ -243,14 +243,13 @@ async def math_trivia_button_false(ctx: ComponentContext):
 
 @bot.command(
     name="animetrivia",
-    description="Play a random animal trivia game.", 
+    description="Play a random animal trivia game.",
 )
 async def animetrivia(ctx: CommandContext):
     global correct_trivia_answer
     anime_trivia = BotRequests.get_anime_trivia()
     await ctx.send(html.unescape(f"{anime_trivia[0]} | The difficulty is {anime_trivia[1]}."))
-    
-    
+
     button = Button(
         style=ButtonStyle.PRIMARY,
         custom_id="anime_trivia_button_true",
@@ -263,11 +262,11 @@ async def animetrivia(ctx: CommandContext):
     )
     action_row = ActionRow(components=[button, button2])
     await ctx.send(f"Please choose an answer {ctx.user.mention}, on whether you think that is true or false.", components=action_row, ephemeral=True)
-    correct_trivia_answer = anime_trivia[2] 
+    correct_trivia_answer = anime_trivia[2]
 
 
 @bot.component("anime_trivia_button_true")
-async def anime_trivia_button_true(ctx: ComponentContext):  
+async def anime_trivia_button_true(ctx: ComponentContext):
     if correct_trivia_answer.lower() == "true":
         await ctx.send(f"{ctx.user.mention} choose True, {ctx.user.mention} is correct!")
     else:
@@ -275,11 +274,11 @@ async def anime_trivia_button_true(ctx: ComponentContext):
 
 
 @bot.component("anime_trivia_button_false")
-async def anime_trivia_button_false(ctx: ComponentContext):  
+async def anime_trivia_button_false(ctx: ComponentContext):
     if correct_trivia_answer.lower() == "false":
         await ctx.send(f"{ctx.user.mention} choose False, {ctx.user.mention} is correct!")
     else:
         await ctx.send(f"{ctx.user.mention} choose False. Sorry, but the correct answer was {correct_trivia_answer}")
 
-    
+
 bot.start()
