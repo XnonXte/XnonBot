@@ -2,9 +2,9 @@
 # Migrated to discord-py-interactions version 5
 import interactions
 import random
-import bot_req
 import html
 
+from XnonBotModules import bot_req
 from os import getenv
 from dotenv import load_dotenv
 
