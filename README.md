@@ -4,11 +4,11 @@ A discord bot developed by XnonXte, written in Python. The official invite link 
 
 ## Changelogs
 
-- Update 18/05/2023 - Migrating XnonBot source code from discord.py to work with interactions.py modules, now all of the available commands would work with </> command.
-- Update 15/05/2023 - Releasing XnonBot Version Beta 0.2, now XnonBot will work with slash command for some of its commands.
-- Update 14/05/2023 - Releasing XnonBot Beta Version 0.1.1, added a few things but mainly .pexels to search for an image on `pexels.com`.
-- Update 13/05/2023 - Releasing XnonBot Beta Version 0.1, added XnonBot source code into GitHub!
+- Update 18/05/2023 - Migrating XnonBot source code from discord.py to work with interactions.py modules, now all of the available commands would work with </> command
+- Update 15/05/2023 - Releasing XnonBot Version Beta 0.2, now XnonBot will work with slash command for some of its commands
+- Update 14/05/2023 - Releasing XnonBot Beta Version 0.1.1, added a few things but mainly `.pexels` to search for an image on pexels.com
+- Update 13/05/2023 - Releasing XnonBot Beta Version 0.1, added XnonBot source code into GitHub
 
 ## Link(s):
 
-XnonBot logo: [external link](https://cdn.discordapp.com/att achments/944147343140327465/1106659505711878154/xnonbot.png)
+XnonBot logo: [download](https://cdn.discordapp.com/attachments/944147343140327465/1106659505711878154/xnonbot.png)
