@@ -1,5 +1,5 @@
 *.env
 __pycache__
 .vscode
-test.py
+test.bot.py
 test_code.py
