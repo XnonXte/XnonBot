@@ -4,6 +4,7 @@ A discord bot developed by XnonXte, written in Python. The official invite link 
 
 ## Changelogs
 
+- Update 19/05/2023 - XnonBot Beta Version 0.2.3, added a category query for get_waifu_pic, and a couple of context menus
 - Update 18/05/2023 - Migrating XnonBot source code from discord.py to work with interactions.py modules, now all of the available commands would work with </> command
 - Update 15/05/2023 - Releasing XnonBot Version Beta 0.2, now XnonBot will work with slash command for some of its commands
 - Update 14/05/2023 - Releasing XnonBot Beta Version 0.1.1, added a few things but mainly `.pexels` to search for an image on pexels.com
