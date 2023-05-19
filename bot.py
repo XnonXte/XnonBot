@@ -1,5 +1,9 @@
 # XnonBot Version Beta 0.2.3
-# Migrated to discord-py-version 5
+# Migrated to discord-py-interactions version 5x
+# todo Buttons for trivia questions should be disabled after pressing, on which I haven't been done since migrating it to discord-py-interactions.
+# todo All of the slash commands should be in different file, I should do OOP better lol.
+# ? Add to ITB when?
+
 import interactions
 import random
 import html
@@ -118,13 +122,13 @@ async def waifu(ctx: SlashContext, category: str):
         await ctx.send(waifu_pic)
 
 
-@slash_command(name="dog", description="Get a random dog picture from https://dog.ceo/dog-api/")
+@slash_command(name="dog", description="Get a random dog picture from https://dog.ceo/dog-api")
 async def dog(ctx: SlashContext):
     dog = bot_req.get_dog_pic()
     await ctx.send(dog)
 
 
-@slash_command(name="cat", description="Get a random cat picture from https://thecatapi.com/")
+@slash_command(name="cat", description="Get a random cat picture from https://thecatapi.com")
 async def cat(ctx: SlashContext):
     cat = bot_req.get_cat_pic()
     await ctx.send(cat)
