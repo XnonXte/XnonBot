@@ -49,8 +49,11 @@ async def on_message(message):
     msgchn = message.channel
 
     def check_message(initial_requests):
-        return initial_requests.author == message.author and initial_requests.channel == msgchn and initial_requests.content.lower(
-        ) in ["true", "false"]
+        return (
+            initial_requests.author == message.author
+            and initial_requests.channel == msgchn
+            and initial_requests.content.lower() in ["true", "false"]
+        )
 
     if message.author == client.user:
         return
@@ -96,19 +99,23 @@ async def on_message(message):
         await msgchn.send(
             html.unescape(
                 f"{animal_trivia[0]} True or false? The difficulty is {animal_trivia[1]}."
-            ))
+            )
+        )
 
         response = await client.wait_for("message", check=check_message)
 
         if response.content.lower() == animal_trivia[2].lower():
             await msgchn.send("You're correct!")
         else:
-            await msgchn.send(
-                f"Sorry, but the correct answer was {animal_trivia[2]}.")
+            await msgchn.send(f"Sorry, but the correct answer was {animal_trivia[2]}.")
 
     if msgcnt.startswith(".mathtrivia"):
         math_trivia = bot_req.get_math_trivia()
-        await msgchn.send(html.unescape(f"{math_trivia[0]} True or false? The difficulty is {math_trivia[1]}."))
+        await msgchn.send(
+            html.unescape(
+                f"{math_trivia[0]} True or false? The difficulty is {math_trivia[1]}."
+            )
+        )
 
         response = await client.wait_for("message", check=check_message)
 
@@ -119,15 +126,18 @@ async def on_message(message):
 
     if msgcnt.startswith(".animetrivia"):
         anime_trivia = bot_req.get_anime_trivia()
-        await msgchn.send(html.unescape(f"{anime_trivia[0]} True or false? The difficulty is {anime_trivia[1]}."))
+        await msgchn.send(
+            html.unescape(
+                f"{anime_trivia[0]} True or false? The difficulty is {anime_trivia[1]}."
+            )
+        )
 
         response = await client.wait_for("message", check=check_message)
 
         if response.content.lower() == anime_trivia[2].lower():
             await msgchn.send("You're correct!")
         else:
-            await msgchn.send(f"Sorry, but the correct answer was {anime_trivia[2]}."
-                              )
+            await msgchn.send(f"Sorry, but the correct answer was {anime_trivia[2]}.")
 
     if msgcnt.startswith(".pexels"):
         try:
@@ -136,44 +146,57 @@ async def on_message(message):
                 return
             query = msgcnt[8:]
             image_output = bot_req.get_pexels_photos(query)
-            await msgchn.send(image_output[2] + " Photographer: " + image_output[0] + " - Powered by pexels.com")
+            await msgchn.send(
+                image_output[2]
+                + " Photographer: "
+                + image_output[0]
+                + " - Powered by pexels.com"
+            )
         except TypeError:
-            await msgchn.send("The image you're searching doesn't exist! Please try again with a different keyword")
+            await msgchn.send(
+                "The image you're searching doesn't exist! Please try again with a different keyword"
+            )
 
-    if msgcnt.startswith('.rps'):
+    if msgcnt.startswith(".rps"):
         if msgcnt == ".rps":
             await msgchn.send(
-                "Please input either rock, paper, or scissors after the command .rps!")
+                "Please input either rock, paper, or scissors after the command .rps!"
+            )
             return
-        choices = ['rock', 'paper', 'scissors']
-        user_choice = msgcnt.split(' ')[1].lower()
+        choices = ["rock", "paper", "scissors"]
+        user_choice = msgcnt.split(" ")[1].lower()
         bot_choice = random.choice(choices)
 
         if user_choice not in choices:
             await msgchn.send(
-                'Invalid choice. Please choose either rock, paper, or scissors.')
+                "Invalid choice. Please choose either rock, paper, or scissors."
+            )
             return
 
         if user_choice == bot_choice:
             await msgchn.send(
-                f'You chose {user_choice}. I chose {bot_choice}. We tied!')
+                f"You chose {user_choice}. I chose {bot_choice}. We tied!"
+            )
             return
 
-        if user_choice == 'rock' and bot_choice == 'scissors':
+        if user_choice == "rock" and bot_choice == "scissors":
             await msgchn.send(
-                f'You chose {user_choice}. I chose {bot_choice}. You won!')
-        elif user_choice == 'scissors' and bot_choice == 'paper':
+                f"You chose {user_choice}. I chose {bot_choice}. You won!"
+            )
+        elif user_choice == "scissors" and bot_choice == "paper":
             await msgchn.send(
-                f'You chose {user_choice}. I chose {bot_choice}. You won!')
-        elif user_choice == 'paper' and bot_choice == 'rock':
+                f"You chose {user_choice}. I chose {bot_choice}. You won!"
+            )
+        elif user_choice == "paper" and bot_choice == "rock":
             await msgchn.send(
-                f'You chose {user_choice}. I chose {bot_choice}. You won!')
+                f"You chose {user_choice}. I chose {bot_choice}. You won!"
+            )
         else:
-            await msgchn.send(
-                f'You chose {user_choice}. I chose {bot_choice}. I won!')
+            await msgchn.send(f"You chose {user_choice}. I chose {bot_choice}. I won!")
 
     if msgcnt.startswith(".say "):
         say_output = msgcnt[5:]
         await msgchn.send(say_output)
+
 
 client.run(os.getenv("XNONBOTTOKEN"))

@@ -17,58 +17,83 @@ def get_quote():
 def get_dog_pic():
     dog_response = requests.get("https://dog.ceo/api/breeds/image/random")
     dog_convert_json = json.loads(dog_response.text)
-    dog_pic = "Here's a random picture of dog for you! " + \
-        dog_convert_json["message"]
+    dog_pic = "Here's a random picture of dog for you! " + dog_convert_json["message"]
     return dog_pic
 
 
 def get_cat_pic():
     cat_response = requests.get("https://api.thecatapi.com/v1/images/search")
     cat_convert_json = json.loads(cat_response.text)
-    cat_pic = "Here's a random picture of cat for you! " + \
-        cat_convert_json[0]["url"]
+    cat_pic = "Here's a random picture of cat for you! " + cat_convert_json[0]["url"]
     return cat_pic
 
 
 def get_waifu_pic(arg):
     waifu_response = requests.get(f"https://api.waifu.pics/sfw/{arg}")
     waifu_convert_json = json.loads(waifu_response.text)
-    waifu_pic = f" Here's a random {arg} picture for you! " + \
-        waifu_convert_json["url"]
+    waifu_pic = f" Here's a random {arg} picture for you! " + waifu_convert_json["url"]
     return waifu_pic
 
 
 def get_animal_trivia():
     animal_trivia_response = requests.get(
-        "https://opentdb.com/api.php?amount=1&category=27&type=boolean")
+        "https://opentdb.com/api.php?amount=1&category=27&type=boolean"
+    )
     animal_trivia_convert_json = json.loads(animal_trivia_response.text)
     animal_trivia_question = animal_trivia_convert_json["results"][0]["question"]
     animal_trivia_difficulty = animal_trivia_convert_json["results"][0]["difficulty"]
-    animal_trivia_correct_answer = animal_trivia_convert_json["results"][0]["correct_answer"]
-    animal_trivia_incorrect_answer = animal_trivia_convert_json["results"][0]["incorrect_answers"]
-    return animal_trivia_question, animal_trivia_difficulty, animal_trivia_correct_answer, animal_trivia_incorrect_answer
+    animal_trivia_correct_answer = animal_trivia_convert_json["results"][0][
+        "correct_answer"
+    ]
+    animal_trivia_incorrect_answer = animal_trivia_convert_json["results"][0][
+        "incorrect_answers"
+    ]
+    return (
+        animal_trivia_question,
+        animal_trivia_difficulty,
+        animal_trivia_correct_answer,
+        animal_trivia_incorrect_answer,
+    )
 
 
 def get_math_trivia():
     math_trivia_response = requests.get(
-        "https://opentdb.com/api.php?amount=1&category=19&type=boolean")
+        "https://opentdb.com/api.php?amount=1&category=19&type=boolean"
+    )
     trivia_convert_json = json.loads(math_trivia_response.text)
     math_trivia_question = trivia_convert_json["results"][0]["question"]
     math_trivia_difficulty = trivia_convert_json["results"][0]["difficulty"]
     math_trivia_correct_answer = trivia_convert_json["results"][0]["correct_answer"]
-    math_trivia_incorrect_answer = trivia_convert_json["results"][0]["incorrect_answers"]
-    return math_trivia_question, math_trivia_difficulty, math_trivia_correct_answer, math_trivia_incorrect_answer
+    math_trivia_incorrect_answer = trivia_convert_json["results"][0][
+        "incorrect_answers"
+    ]
+    return (
+        math_trivia_question,
+        math_trivia_difficulty,
+        math_trivia_correct_answer,
+        math_trivia_incorrect_answer,
+    )
 
 
 def get_anime_trivia():
     anime_trivia_response = requests.get(
-        "https://opentdb.com/api.php?amount=1&category=31&type=boolean")
+        "https://opentdb.com/api.php?amount=1&category=31&type=boolean"
+    )
     anime_trivia_convert_json = json.loads(anime_trivia_response.text)
     anime_trivia_question = anime_trivia_convert_json["results"][0]["question"]
     anime_trivia_difficulty = anime_trivia_convert_json["results"][0]["difficulty"]
-    anime_trivia_correct_answer = anime_trivia_convert_json["results"][0]["correct_answer"]
-    anime_trivia_incorrect_answer = anime_trivia_convert_json["results"][0]["incorrect_answers"]
-    return anime_trivia_question, anime_trivia_difficulty, anime_trivia_correct_answer, anime_trivia_incorrect_answer
+    anime_trivia_correct_answer = anime_trivia_convert_json["results"][0][
+        "correct_answer"
+    ]
+    anime_trivia_incorrect_answer = anime_trivia_convert_json["results"][0][
+        "incorrect_answers"
+    ]
+    return (
+        anime_trivia_question,
+        anime_trivia_difficulty,
+        anime_trivia_correct_answer,
+        anime_trivia_incorrect_answer,
+    )
 
 
 def get_pexels_photos(query):

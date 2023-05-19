@@ -8,8 +8,24 @@ import interactions
 import random
 import html
 
-from interactions import (listen, slash_command, slash_option, SlashContext, slash_option, OptionType, ActionRow,
-                          ComponentContext, component_callback, message_context_menu, user_context_menu, ContextMenuContext, Message, Member, Button, ButtonStyle)
+from interactions import (
+    listen,
+    slash_command,
+    slash_option,
+    SlashContext,
+    slash_option,
+    OptionType,
+    ActionRow,
+    ComponentContext,
+    component_callback,
+    message_context_menu,
+    user_context_menu,
+    ContextMenuContext,
+    Message,
+    Member,
+    Button,
+    ButtonStyle,
+)
 from XnonBotModules import bot_req
 from os import getenv
 from dotenv import load_dotenv
@@ -43,8 +59,39 @@ Want to contribute on the bot? Please send me a DM on discord (XnonXte#2517).
 """
 
 # Up-to-date as of 19/05/2023
-waifu_category_list = ('waifu', 'neko', 'shinobu', 'megumin', 'bully', 'cuddle', 'cry', 'hug', 'awoo', 'kiss', 'lick', 'pat', 'smug', 'bonk', 'yeet',
-                       'blush', 'smile', 'wave', 'highfive', 'handhold', 'nom', 'bite', 'glomp', 'slap', 'kill', 'kick', 'happy', 'wink', 'poke', 'dance', 'cringe')
+waifu_category_list = (
+    "waifu",
+    "neko",
+    "shinobu",
+    "megumin",
+    "bully",
+    "cuddle",
+    "cry",
+    "hug",
+    "awoo",
+    "kiss",
+    "lick",
+    "pat",
+    "smug",
+    "bonk",
+    "yeet",
+    "blush",
+    "smile",
+    "wave",
+    "highfive",
+    "handhold",
+    "nom",
+    "bite",
+    "glomp",
+    "slap",
+    "kill",
+    "kick",
+    "happy",
+    "wink",
+    "poke",
+    "dance",
+    "cringe",
+)
 
 
 @listen()
@@ -60,8 +107,11 @@ async def on_startup():
  /_/ \_\_| |_|\___/|_| |_|____/ \___/ \__|
                                           
                                           
-""")
-    print("This bot is developed by XnonXte, refer to my GitHub for contact information. Enjoy using the bot!")
+"""
+    )
+    print(
+        "This bot is developed by XnonXte, refer to my GitHub for contact information. Enjoy using the bot!"
+    )
 
 
 @slash_command(name="hello", description="Say hello to the user.")
@@ -79,7 +129,7 @@ async def help(ctx: SlashContext):
     opt_type=OptionType.STRING,
     name="message",
     description="Message to send",
-    required=True
+    required=True,
 )
 async def say(ctx: SlashContext, message: str):
     await ctx.send(f"{ctx.user.mention} said: `{message}`")
@@ -106,12 +156,15 @@ async def quote(ctx: SlashContext):
     await ctx.send(quote)
 
 
-@slash_command(name="waifu", description="Get a random waifu picture from https://waifu.pics/docs (it's SFW don't worry!)")
+@slash_command(
+    name="waifu",
+    description="Get a random waifu picture from https://waifu.pics/docs (it's SFW don't worry!)",
+)
 @slash_option(
     opt_type=OptionType.STRING,
     name="category",
     description="Enter the category (e.g. 'waifu', refer to https://waifu.pics/docs for more information!)",
-    required=True
+    required=True,
 )
 async def waifu(ctx: SlashContext, category: str):
     if category not in waifu_category_list:
@@ -122,13 +175,17 @@ async def waifu(ctx: SlashContext, category: str):
         await ctx.send(waifu_pic)
 
 
-@slash_command(name="dog", description="Get a random dog picture from https://dog.ceo/dog-api")
+@slash_command(
+    name="dog", description="Get a random dog picture from https://dog.ceo/dog-api"
+)
 async def dog(ctx: SlashContext):
     dog = bot_req.get_dog_pic()
     await ctx.send(dog)
 
 
-@slash_command(name="cat", description="Get a random cat picture from https://thecatapi.com")
+@slash_command(
+    name="cat", description="Get a random cat picture from https://thecatapi.com"
+)
 async def cat(ctx: SlashContext):
     cat = bot_req.get_cat_pic()
     await ctx.send(cat)
@@ -139,7 +196,7 @@ async def cat(ctx: SlashContext):
     opt_type=OptionType.STRING,
     name="choice",
     description="Enter your choice (rock, paper, scissors).",
-    required=True
+    required=True,
 )
 async def rps(ctx: SlashContext, choice: str):
     choices = ("rock", "paper", "scissors")
@@ -147,24 +204,31 @@ async def rps(ctx: SlashContext, choice: str):
 
     if choice not in choices:
         await ctx.send(
-            'Invalid choice. Please choose either rock, paper, or scissors!', ephemeral=True)
+            "Invalid choice. Please choose either rock, paper, or scissors!",
+            ephemeral=True,
+        )
         return
 
     if choice == bot_choice:
         await ctx.send(
-            f'{ctx.user.mention} chose {choice}. I chose {bot_choice}. We tied!')
-    elif choice == 'rock' and bot_choice == 'scissors':
+            f"{ctx.user.mention} chose {choice}. I chose {bot_choice}. We tied!"
+        )
+    elif choice == "rock" and bot_choice == "scissors":
         await ctx.send(
-            f'{ctx.user.mention} chose {choice}. I chose {bot_choice}. {ctx.user.mention} won!')
-    elif choice == 'scissors' and bot_choice == 'paper':
+            f"{ctx.user.mention} chose {choice}. I chose {bot_choice}. {ctx.user.mention} won!"
+        )
+    elif choice == "scissors" and bot_choice == "paper":
         await ctx.send(
-            f'{ctx.user.mention} chose {choice}. I chose {bot_choice}. {ctx.user.mention} won!')
-    elif choice == 'paper' and bot_choice == 'rock':
+            f"{ctx.user.mention} chose {choice}. I chose {bot_choice}. {ctx.user.mention} won!"
+        )
+    elif choice == "paper" and bot_choice == "rock":
         await ctx.send(
-            f'{ctx.user.mention} chose {choice}. I chose {bot_choice}. {ctx.user.mention} won!')
+            f"{ctx.user.mention} chose {choice}. I chose {bot_choice}. {ctx.user.mention} won!"
+        )
     else:
         await ctx.send(
-            f'{ctx.user.mention} chose {choice}. I chose {bot_choice}. I won!')
+            f"{ctx.user.mention} chose {choice}. I chose {bot_choice}. I won!"
+        )
 
 
 @slash_command(name="pexels", description="Search an image on pexels.com")
@@ -172,18 +236,22 @@ async def rps(ctx: SlashContext, choice: str):
     opt_type=OptionType.STRING,
     name="search_query",
     description="Image to search",
-    required=True
+    required=True,
 )
 async def pexels(ctx: SlashContext, search_query: str):
     image_output = bot_req.get_pexels_photos(search_query)
-    await ctx.send(f"An image of {search_query} has been generated! Photographed by: {image_output[0]}, original link: {image_output[2]} - Powered by pexels.com")
+    await ctx.send(
+        f"An image of {search_query} has been generated! Photographed by: {image_output[0]}, original link: {image_output[2]} - Powered by pexels.com"
+    )
 
 
 @slash_command(name="animaltrivia", description="Play a random animal trivia game.")
 async def animaltrivia(ctx: SlashContext):
     global correct_trivia_answer
     animal_trivia = bot_req.get_animal_trivia()
-    await ctx.send(html.unescape(f"{animal_trivia[0]} | The difficulty is {animal_trivia[1]}."))
+    await ctx.send(
+        html.unescape(f"{animal_trivia[0]} | The difficulty is {animal_trivia[1]}.")
+    )
 
     components: list[ActionRow] = [
         ActionRow(
@@ -195,29 +263,41 @@ async def animaltrivia(ctx: SlashContext):
             Button(
                 style=ButtonStyle.DANGER,
                 custom_id="animal_trivia_button_false",
-                label="False"
-            )
+                label="False",
+            ),
         )
     ]
 
-    await ctx.send(f"Please choose an answer {ctx.user.mention}, on whether you think that is true or false.", components=components, ephemeral=True)
+    await ctx.send(
+        f"Please choose an answer {ctx.user.mention}, on whether you think that is true or false.",
+        components=components,
+        ephemeral=True,
+    )
     correct_trivia_answer = animal_trivia[2]
 
 
 @component_callback("animal_trivia_button_true")
 async def animal_trivia_button_true(ctx: ComponentContext):
     if correct_trivia_answer.lower() == "true":
-        await ctx.send(f"{ctx.user.mention} choose True, {ctx.user.mention} is correct!")
+        await ctx.send(
+            f"{ctx.user.mention} choose True, {ctx.user.mention} is correct!"
+        )
     else:
-        await ctx.send(f"{ctx.user.mention} choose True. Sorry, but the correct answer was {correct_trivia_answer}.")
+        await ctx.send(
+            f"{ctx.user.mention} choose True. Sorry, but the correct answer was {correct_trivia_answer}."
+        )
 
 
 @component_callback("animal_trivia_button_false")
 async def animal_trivia_button_false(ctx: ComponentContext):
     if correct_trivia_answer.lower() == "false":
-        await ctx.send(f"{ctx.user.mention} choose False, {ctx.user.mention} is correct!")
+        await ctx.send(
+            f"{ctx.user.mention} choose False, {ctx.user.mention} is correct!"
+        )
     else:
-        await ctx.send(f"{ctx.user.mention} choose False. Sorry, but the correct answer was {correct_trivia_answer}.")
+        await ctx.send(
+            f"{ctx.user.mention} choose False. Sorry, but the correct answer was {correct_trivia_answer}."
+        )
 
 
 @slash_command(
@@ -227,7 +307,9 @@ async def animal_trivia_button_false(ctx: ComponentContext):
 async def mathtrivia(ctx: SlashContext):
     global correct_trivia_answer
     math_trivia = bot_req.get_math_trivia()
-    await ctx.send(html.unescape(f"{math_trivia[0]} | The difficulty is {math_trivia[1]}."))
+    await ctx.send(
+        html.unescape(f"{math_trivia[0]} | The difficulty is {math_trivia[1]}.")
+    )
 
     components = list[ActionRow] = [
         ActionRow(
@@ -239,28 +321,40 @@ async def mathtrivia(ctx: SlashContext):
             Button(
                 style=ButtonStyle.DANGER,
                 custom_id="math_trivia_button_false",
-                label="False"
-            )
+                label="False",
+            ),
         )
     ]
-    await ctx.send(f"Please choose an answer {ctx.user.mention}, on whether you think that is true or false.", components=components, ephemeral=True)
+    await ctx.send(
+        f"Please choose an answer {ctx.user.mention}, on whether you think that is true or false.",
+        components=components,
+        ephemeral=True,
+    )
     correct_trivia_answer = math_trivia[2]
 
 
 @component_callback("math_trivia_button_true")
 async def math_trivia_button_true(ctx: ComponentContext):
     if correct_trivia_answer.lower() == "true":
-        await ctx.send(f"{ctx.user.mention} choose True, {ctx.user.mention} is correct!")
+        await ctx.send(
+            f"{ctx.user.mention} choose True, {ctx.user.mention} is correct!"
+        )
     else:
-        await ctx.send(f"{ctx.user.mention} choose True. Sorry, but the correct answer was {correct_trivia_answer}")
+        await ctx.send(
+            f"{ctx.user.mention} choose True. Sorry, but the correct answer was {correct_trivia_answer}"
+        )
 
 
 @component_callback("math_trivia_button_false")
 async def math_trivia_button_false(ctx: ComponentContext):
     if correct_trivia_answer.lower() == "false":
-        await ctx.send(f"{ctx.user.mention} choose False, {ctx.user.mention} is correct!")
+        await ctx.send(
+            f"{ctx.user.mention} choose False, {ctx.user.mention} is correct!"
+        )
     else:
-        await ctx.send(f"{ctx.user.mention} choose False. Sorry, but the correct answer was {correct_trivia_answer}")
+        await ctx.send(
+            f"{ctx.user.mention} choose False. Sorry, but the correct answer was {correct_trivia_answer}"
+        )
 
 
 @slash_command(
@@ -270,7 +364,9 @@ async def math_trivia_button_false(ctx: ComponentContext):
 async def animetrivia(ctx: SlashContext):
     global correct_trivia_answer
     anime_trivia = bot_req.get_anime_trivia()
-    await ctx.send(html.unescape(f"{anime_trivia[0]} | The difficulty is {anime_trivia[1]}."))
+    await ctx.send(
+        html.unescape(f"{anime_trivia[0]} | The difficulty is {anime_trivia[1]}.")
+    )
 
     components = list[ActionRow] = [
         ActionRow(
@@ -282,28 +378,40 @@ async def animetrivia(ctx: SlashContext):
             Button(
                 style=ButtonStyle.DANGER,
                 custom_id="anime_trivia_button_false",
-                label="False"
-            )
+                label="False",
+            ),
         )
     ]
-    await ctx.send(f"Please choose an answer {ctx.user.mention}, on whether you think that is true or false.", components=components, ephemeral=True)
+    await ctx.send(
+        f"Please choose an answer {ctx.user.mention}, on whether you think that is true or false.",
+        components=components,
+        ephemeral=True,
+    )
     correct_trivia_answer = anime_trivia[2]
 
 
 @component_callback("anime_trivia_button_true")
 async def anime_trivia_button_true(ctx: ComponentContext):
     if correct_trivia_answer.lower() == "true":
-        await ctx.send(f"{ctx.user.mention} choose True, {ctx.user.mention} is correct!")
+        await ctx.send(
+            f"{ctx.user.mention} choose True, {ctx.user.mention} is correct!"
+        )
     else:
-        await ctx.send(f"{ctx.user.mention} choose True. Sorry, but the correct answer was {correct_trivia_answer}")
+        await ctx.send(
+            f"{ctx.user.mention} choose True. Sorry, but the correct answer was {correct_trivia_answer}"
+        )
 
 
 @component_callback("anime_trivia_button_false")
 async def anime_trivia_button_false(ctx: ComponentContext):
     if correct_trivia_answer.lower() == "false":
-        await ctx.send(f"{ctx.user.mention} choose False, {ctx.user.mention} is correct!")
+        await ctx.send(
+            f"{ctx.user.mention} choose False, {ctx.user.mention} is correct!"
+        )
     else:
-        await ctx.send(f"{ctx.user.mention} choose False. Sorry, but the correct answer was {correct_trivia_answer}")
+        await ctx.send(
+            f"{ctx.user.mention} choose False. Sorry, but the correct answer was {correct_trivia_answer}"
+        )
 
 
 # This opens up if you right-click a message and choose Apps.
@@ -320,7 +428,10 @@ async def ping(ctx: ContextMenuContext):
 
 @message_context_menu(name="Quickstart (message)")
 async def quickstart_message(ctx: ContextMenuContext):
-    await ctx.send(f"Hello there {ctx.user.mention}! Thank you for using XnonBot on discord. You can either use `/help` or `$help` to prompt all the available commands for this bot.", ephemeral=True)
+    await ctx.send(
+        f"Hello there {ctx.user.mention}! Thank you for using XnonBot on discord. You can either use `/help` or `$help` to prompt all the available commands for this bot.",
+        ephemeral=True,
+    )
 
 
 # This opens up if you right-click a user and choose Apps.
@@ -332,7 +443,10 @@ async def ping(ctx: ContextMenuContext):
 
 @user_context_menu(name="Quickstart (user)")
 async def quickstart_usere(ctx: ContextMenuContext):
-    await ctx.send(f"Hello there {ctx.user.mention}! Thank you for using XnonBot on discord. You can either use `/help` or `$help` to prompt all the available commands for this bot.", ephemeral=True)
+    await ctx.send(
+        f"Hello there {ctx.user.mention}! Thank you for using XnonBot on discord. You can either use `/help` or `$help` to prompt all the available commands for this bot.",
+        ephemeral=True,
+    )
 
 
 bot.start(getenv("XNONBOTTOKEN"))
