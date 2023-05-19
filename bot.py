@@ -1,4 +1,4 @@
-# XnonBot Version Beta 0.2.2
+# XnonBot Version Beta 0.2.3
 # Migrated to discord-py-interactions version 5
 import interactions
 import random
@@ -31,6 +31,9 @@ List of avalaible commands (prompted using </> command):
 `animaltrivia` - Send a random animal trivia and asking the user whether it's true or false
 `mathtrivia` - Send a random math trivia and asking the user whether it's true or false
 `animetrivia` - Send a random anime trivia and asking the user whether it's true or false
+
+Have an issue with the bot? Please file a new issue on GitHub.
+Want to contribute on the bot? Please send me a DM on discord (XnonXte#2517). 
 """
 
 
@@ -281,6 +284,35 @@ async def anime_trivia_button_false(ctx: interactions.ComponentContext):
         await ctx.send(f"{ctx.user.mention} choose False, {ctx.user.mention} is correct!")
     else:
         await ctx.send(f"{ctx.user.mention} choose False. Sorry, but the correct answer was {correct_trivia_answer}")
+
+
+# This opens up if you right-click a message and choose Apps.
+@interactions.message_context_menu(name="Repeat")
+async def repeat(ctx: interactions.ContextMenuContext):
+    message: interactions.Message = ctx.target
+    await ctx.send(message.content)
+
+
+@interactions.message_context_menu(name="Help")
+async def ping(ctx: interactions.ContextMenuContext):
+    await ctx.send(COMMANDS)
+
+
+@interactions.message_context_menu(name="Quickstart (message)")
+async def quickstart_message(ctx: interactions.ContextMenuContext):
+    await ctx.send(f"Hello there {ctx.user.mention}! Thank you for using XnonBot on discord. You can either use `/help` or `$help` to prompt all the available commands for this bot.", ephemeral=True)
+
+
+# This opens up if you right-click a user and choose Apps.
+@interactions.user_context_menu(name="Ping")
+async def ping(ctx: interactions.ContextMenuContext):
+    member: interactions.Member = ctx.target
+    await ctx.send(f"Pong {member.mention}!")
+
+
+@interactions.user_context_menu(name="Quickstart (user)")
+async def quickstart_usere(ctx: interactions.ContextMenuContext):
+    await ctx.send(f"Hello there {ctx.user.mention}! Thank you for using XnonBot on discord. You can either use `/help` or `$help` to prompt all the available commands for this bot.", ephemeral=True)
 
 
 bot.start(getenv("XNONBOTTOKEN"))
