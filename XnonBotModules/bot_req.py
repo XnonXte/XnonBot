@@ -17,34 +17,25 @@ def get_quote():
 def get_dog_pic():
     dog_response = requests.get("https://dog.ceo/api/breeds/image/random")
     dog_convert_json = json.loads(dog_response.text)
-    dog_pic = dog_convert_json["message"] + \
-        " Here's a random picture of dog for you!"
+    dog_pic = "Here's a random picture of dog for you! " + \
+        dog_convert_json["message"]
     return dog_pic
 
 
 def get_cat_pic():
     cat_response = requests.get("https://api.thecatapi.com/v1/images/search")
     cat_convert_json = json.loads(cat_response.text)
-    cat_pic = cat_convert_json[0]["url"] + \
-        " Here's a random picture of cat for you!"
+    cat_pic = "Here's a random picture of cat for you! " + \
+        cat_convert_json[0]["url"]
     return cat_pic
 
 
-def get_waifu_pic():
-    waifu_response = requests.get("https://api.waifu.pics/sfw/waifu")
+def get_waifu_pic(arg):
+    waifu_response = requests.get(f"https://api.waifu.pics/sfw/{arg}")
     waifu_convert_json = json.loads(waifu_response.text)
-    waifu_pic = waifu_convert_json["url"] + \
-        " Here's a random waifu picture for you!"
+    waifu_pic = f" Here's a random {arg} picture for you! " + \
+        waifu_convert_json["url"]
     return waifu_pic
-
-
-#! Warning that this is NSFW, I will not be putting it into my bot.
-# def get_waifu_pic_nsfw():
-#   waifu_nsfw_response = requests.get("https://api.waifu.pics/nsfw/waifu")
-#   waifu_nsfw_convert_json = json.loads(waifu_nsfw_response.text)
-#   waifu_nsfw_pic= waifu_nsfw_convert_json[
-#     "url"] + " random picture of waifu has been generated!"
-#   return waifu_nsfw_pic
 
 
 def get_animal_trivia():

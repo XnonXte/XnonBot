@@ -26,7 +26,7 @@ List of avalaible commands (prompted using </> command):
 `say` - Tell the bot to say something (the same message you're inputting with the commmand)
 `cat` - Send a random cat picture
 `dog` - Send a random dog picture
-`waifu` - Send a random waifu picture (it's mostly SFW!)
+`waifu` - Send a random waifu picture (it's SFW!)
 `pexels` - Search an image on pexels.com
 `animaltrivia` - Send a random animal trivia and asking the user whether it's true or false
 `mathtrivia` - Send a random math trivia and asking the user whether it's true or false
@@ -35,6 +35,9 @@ List of avalaible commands (prompted using </> command):
 Have an issue with the bot? Please file a new issue on GitHub.
 Want to contribute on the bot? Please send me a DM on discord (XnonXte#2517). 
 """
+
+waifu_category_list = ('waifu', 'neko', 'shinobu', 'megumin', 'bully', 'cuddle', 'cry', 'hug', 'awoo', 'kiss', 'lick', 'pat', 'smug', 'bonk', 'yeet',
+                       'blush', 'smile', 'wave', 'highfive', 'handhold', 'nom', 'bite', 'glomp', 'slap', 'kill', 'kick', 'happy', 'wink', 'poke', 'dance', 'cringe')
 
 
 @interactions.listen()
@@ -96,19 +99,29 @@ async def quote(ctx: interactions.SlashContext):
     await ctx.send(quote)
 
 
-@interactions.slash_command(name="waifu", description="Get a random waifu picture from api.waifu.pics")
-async def waifu(ctx: interactions.SlashContext):
-    waifu = bot_req.get_waifu_pic()
-    await ctx.send(waifu)
+@interactions.slash_command(name="waifu", description="Get a random waifu picture from https://waifu.pics/docs (it's SFW don't worry!)")
+@interactions.slash_option(
+    opt_type=interactions.OptionType.STRING,
+    name="category",
+    description="Enter the category (e.g. 'waifu', refer to https://waifu.pics/docs for more information!)",
+    required=True
+)
+async def waifu(ctx: interactions.SlashContext, category: str):
+    if category not in waifu_category_list:
+        await ctx.send("Please enter a valid category!", ephemeral=True)
+        return
+    else:
+        waifu_pic = bot_req.get_waifu_pic(category)
+        await ctx.send(waifu_pic)
 
 
-@interactions.slash_command(name="dog", description="Get a random dog picture from dog.ceo")
+@interactions.slash_command(name="dog", description="Get a random dog picture from https://dog.ceo/dog-api/")
 async def dog(ctx: interactions.SlashContext):
     dog = bot_req.get_dog_pic()
     await ctx.send(dog)
 
 
-@interactions.slash_command(name="cat", description="Get a random cat picture from api.thecatapi.com")
+@interactions.slash_command(name="cat", description="Get a random cat picture from https://thecatapi.com/")
 async def cat(ctx: interactions.SlashContext):
     cat = bot_req.get_cat_pic()
     await ctx.send(cat)
