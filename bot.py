@@ -87,25 +87,25 @@ async def github(ctx: interactions.SlashContext):
     await ctx.send("https://github.com/XnonXte/XnonBot")
 
 
-@interactions.slash_command(name="quote", description="Get a random quote.")
+@interactions.slash_command(name="quote", description="Get a random quote from zenquotes.io")
 async def quote(ctx: interactions.SlashContext):
     quote = bot_req.get_quote()
     await ctx.send(quote)
 
 
-@interactions.slash_command(name="waifu", description="Get a random waifu picture.")
+@interactions.slash_command(name="waifu", description="Get a random waifu picture from api.waifu.pics")
 async def waifu(ctx: interactions.SlashContext):
     waifu = bot_req.get_waifu_pic()
     await ctx.send(waifu)
 
 
-@interactions.slash_command(name="dog", description="Get a random dog picture.")
+@interactions.slash_command(name="dog", description="Get a random dog picture from dog.ceo")
 async def dog(ctx: interactions.SlashContext):
     dog = bot_req.get_dog_pic()
     await ctx.send(dog)
 
 
-@interactions.slash_command(name="cat", description="Get a random cat picture.")
+@interactions.slash_command(name="cat", description="Get a random cat picture from api.thecatapi.com")
 async def cat(ctx: interactions.SlashContext):
     cat = bot_req.get_cat_pic()
     await ctx.send(cat)
