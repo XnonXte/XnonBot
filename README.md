@@ -6,9 +6,7 @@ A discord bot developed by XnonXte, written in Python. The official invite link 
 
 Type `/help` on Discord to prompt the list of available commands. As of 18/05/2023, all XnonBot commands will work with the </> command.
 
-## Available trivia categories
-
-animal, anime, math, art, history, geography, celebrities, cartoons, computers, and sports (It's case-sensitive so watch out!).
+**Available trivia categories:** animal, anime, math, art, history, geography, celebrities, cartoons, computers, and sports. 
 
 ## Changelogs
 
@@ -19,6 +17,6 @@ animal, anime, math, art, history, geography, celebrities, cartoons, computers, 
 - Update 14/05/2023 - Releasing XnonBot Beta Version 0.1.1, added a few things but mainly `.pexels` to search for an image on pexels.com
 - Update 13/05/2023 - Releasing XnonBot Beta Version 0.1, added XnonBot source code into GitHub
 
-## Link(s)
+### Link(s)
 
 XnonBot logo: [download](https://cdn.discordapp.com/attachments/944147343140327465/1106659505711878154/xnonbot.png)
