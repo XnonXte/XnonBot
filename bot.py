@@ -2,7 +2,7 @@
 # Migrated to discord-py-interactions version 5x
 # * Fixed the issue with pressing buttons.
 # * Added a lot more comments.
-# todo All of the slash commands should be in different file, I should do OOP better lol.
+# todo All of the slash commands should be in different file with classes and stuff, I should do OOP better lol.
 # ? Add to ITB when?
 
 import interactions
@@ -46,12 +46,11 @@ List of avalaible commands (prompted using </> command):
 `dog` - Send a random dog picture
 `waifu` - Send a random waifu picture (it's SFW!)
 `pexels` - Search an image on pexels.com
-`animaltrivia` - Send a random animal trivia and asking the user whether it's true or false
-`mathtrivia` - Send a random math trivia and asking the user whether it's true or false
-`animetrivia` - Send a random anime trivia and asking the user whether it's true or false
+`trivia` - Send a random  trivia question and asking the user whether it's true or false
+`convertticks` - Convert ticks to seconds.
+`convertseconds` - Convert seconds to ticks.
 
-Have an issue with the bot? Please file a new issue on GitHub.
-Want to contribute on the bot? Please send me a DM on discord (XnonXte#2517). 
+There's also a couple of context menus that you'd have to look up by yourself. Have fun using the bot!
 """
 
 # Also available on the Github page.
@@ -259,7 +258,11 @@ async def pexels(ctx: SlashContext, search_query: str):
     )
 
 
-@slash_command(name="trivia", description="Play a trivia game.")
+@slash_command(
+    name="trivia",
+    description="Play a trivia game (database from https://opentdb.com/).",
+    scopes=[1103578001318346812],
+)
 @slash_option(
     opt_type=OptionType.STRING,
     name="category",
