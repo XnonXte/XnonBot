@@ -1,13 +1,13 @@
-# XnonBot Version Beta 0.2.3
+# XnonBot Version Beta 0.3
 # Migrated to discord-py-interactions version 5x
-# todo Buttons for trivia questions should be disabled after pressing, on which I haven't been done since migrating it to discord-py-interactions.
+# * Fixed the issue with pressing buttons.
+# * Added a lot more comments.
 # todo All of the slash commands should be in different file, I should do OOP better lol.
 # ? Add to ITB when?
 
 import interactions
 import random
 import html
-
 from interactions import (
     listen,
     slash_command,
@@ -15,9 +15,6 @@ from interactions import (
     SlashContext,
     slash_option,
     OptionType,
-    ActionRow,
-    ComponentContext,
-    component_callback,
     message_context_menu,
     user_context_menu,
     ContextMenuContext,
@@ -27,13 +24,12 @@ from interactions import (
     ButtonStyle,
 )
 from XnonBotModules import bot_req
-from os import getenv
-from dotenv import load_dotenv
+from interactions.api.events import Component
+import os
+import dotenv
 
-load_dotenv("C:\Programming\XnonBot\dev.env")
+dotenv.load_dotenv("C:\Programming\XnonBot\dev.env")
 bot = interactions.Client()
-
-correct_trivia_answer = None
 
 COMMANDS = """
 List of avalaible commands (prompted using </> command):
@@ -57,6 +53,20 @@ List of avalaible commands (prompted using </> command):
 Have an issue with the bot? Please file a new issue on GitHub.
 Want to contribute on the bot? Please send me a DM on discord (XnonXte#2517). 
 """
+
+# Also available on the Github page.
+trivia_category_list = [
+    "animal",
+    "anime",
+    "math",
+    "history",
+    "geography",
+    "art",
+    "celebrity",
+    "computers",
+    "sports",
+    "cartoons",
+]
 
 # Up-to-date as of 19/05/2023
 waifu_category_list = (
@@ -95,7 +105,7 @@ waifu_category_list = (
 
 
 @listen()
-async def on_startup():
+async def on_startup():  # We're using on_startup() instead of on_ready() because of interactions.py version 5, but both are mostly the same.
     print(f"The bot is running as {bot.user}!")
     print(
         """
@@ -114,6 +124,7 @@ async def on_startup():
     )
 
 
+# Every functions starting with the @slash_command decorator will be able to be prompted with </> command on discord.
 @slash_command(name="hello", description="Say hello to the user.")
 async def hello(ctx: SlashContext):
     await ctx.send(f"Hello there {ctx.user.mention}!")
@@ -124,6 +135,7 @@ async def help(ctx: SlashContext):
     await ctx.send(COMMANDS)
 
 
+# In this instance, we're using @slash_option to make an option for our slash command, we'll be using much of this later on.
 @slash_command(name="say", description="Tell the bot to say something.")
 @slash_option(
     opt_type=OptionType.STRING,
@@ -167,7 +179,9 @@ async def quote(ctx: SlashContext):
     required=True,
 )
 async def waifu(ctx: SlashContext, category: str):
-    if category not in waifu_category_list:
+    if (
+        category not in waifu_category_list
+    ):  # If the category that the user is inputting doesn't exist, we're using ephemeral=True so it's only viewable by the user.
         await ctx.send("Please enter a valid category!", ephemeral=True)
         return
     else:
@@ -245,173 +259,105 @@ async def pexels(ctx: SlashContext, search_query: str):
     )
 
 
-@slash_command(name="animaltrivia", description="Play a random animal trivia game.")
-async def animaltrivia(ctx: SlashContext):
-    global correct_trivia_answer
-    animal_trivia = bot_req.get_animal_trivia()
-    await ctx.send(
-        html.unescape(f"{animal_trivia[0]} | The difficulty is {animal_trivia[1]}.")
-    )
-
-    components: list[ActionRow] = [
-        ActionRow(
-            Button(
-                style=ButtonStyle.PRIMARY,
-                custom_id="animal_trivia_button_true",
-                label="True",
-            ),
-            Button(
-                style=ButtonStyle.DANGER,
-                custom_id="animal_trivia_button_false",
-                label="False",
-            ),
-        )
-    ]
-
-    await ctx.send(
-        f"Please choose an answer {ctx.user.mention}, on whether you think that is true or false.",
-        components=components,
-        ephemeral=True,
-    )
-    correct_trivia_answer = animal_trivia[2]
-
-
-@component_callback("animal_trivia_button_true")
-async def animal_trivia_button_true(ctx: ComponentContext):
-    if correct_trivia_answer.lower() == "true":
-        await ctx.send(
-            f"{ctx.user.mention} choose True, {ctx.user.mention} is correct!"
-        )
-    else:
-        await ctx.send(
-            f"{ctx.user.mention} choose True. Sorry, but the correct answer was {correct_trivia_answer}."
-        )
-
-
-@component_callback("animal_trivia_button_false")
-async def animal_trivia_button_false(ctx: ComponentContext):
-    if correct_trivia_answer.lower() == "false":
-        await ctx.send(
-            f"{ctx.user.mention} choose False, {ctx.user.mention} is correct!"
-        )
-    else:
-        await ctx.send(
-            f"{ctx.user.mention} choose False. Sorry, but the correct answer was {correct_trivia_answer}."
-        )
-
-
-@slash_command(
-    name="mathtrivia",
-    description="Play a random math trivia game.",
+@slash_command(name="trivia", description="Play a trivia game.")
+@slash_option(
+    opt_type=OptionType.STRING,
+    name="category",
+    description="Choose a category (e.g. 'animal', refer to github for the list of available trivia categories.)).",
+    required=True,
 )
-async def mathtrivia(ctx: SlashContext):
-    global correct_trivia_answer
-    math_trivia = bot_req.get_math_trivia()
+async def trivia(ctx: SlashContext, category: str):
+    if category not in trivia_category_list:
+        await ctx.send(
+            "Invalid category, please try again! (Please refer to the GitHub page for the available categories).",
+            ephemeral=True,
+        )
+        return
+
+    global trivia_button_true, trivia_button_false, trivia_message, correct_trivia_answer  # We're using the global keyword to store the necesarry variables globally since it's necesarry to have them in later decorator.
+    trivia_question = bot_req.get_trivia(category)
+    correct_trivia_answer = trivia_question[2]
+
     await ctx.send(
-        html.unescape(f"{math_trivia[0]} | The difficulty is {math_trivia[1]}.")
+        html.unescape(f"{trivia_question[0]} | The difficulty is {trivia_question[1]}")
     )
 
-    components = list[ActionRow] = [
-        ActionRow(
-            Button(
-                style=ButtonStyle.PRIMARY,
-                custom_id="math_trivia_button_true",
-                label="True",
-            ),
-            Button(
-                style=ButtonStyle.DANGER,
-                custom_id="math_trivia_button_false",
-                label="False",
-            ),
-        )
-    ]
-    await ctx.send(
-        f"Please choose an answer {ctx.user.mention}, on whether you think that is true or false.",
-        components=components,
-        ephemeral=True,
+    trivia_button_true = Button(
+        style=ButtonStyle.PRIMARY,
+        label="True",
+        custom_id="button_true",
+        disabled=False,
     )
-    correct_trivia_answer = math_trivia[2]
+    trivia_button_false = Button(
+        style=ButtonStyle.DANGER,
+        label="False",
+        custom_id="button_false",
+        disabled=False,
+    )
+
+    trivia_message = await ctx.send(
+        f"Please choose your answer {ctx.user.mention}.",
+        components=[trivia_button_true, trivia_button_false],
+    )
 
 
-@component_callback("math_trivia_button_true")
-async def math_trivia_button_true(ctx: ComponentContext):
-    if correct_trivia_answer.lower() == "true":
-        await ctx.send(
-            f"{ctx.user.mention} choose True, {ctx.user.mention} is correct!"
-        )
-    else:
-        await ctx.send(
-            f"{ctx.user.mention} choose True. Sorry, but the correct answer was {correct_trivia_answer}"
-        )
+@listen()
+async def on_component(event: Component):
+    ctx = event.ctx
+
+    if (
+        ctx.client != event.client
+    ):  # Check if the user pressing the button is the same person as the one requesting them; otherwise, return ().
+        return
+
+    trivia_button_true.disabled = trivia_button_false.disabled = True
+    await trivia_message.edit(components=[trivia_button_true, trivia_button_false])
+
+    if ctx.custom_id == "button_true":
+        if correct_trivia_answer.lower() == "true":
+            await ctx.send(
+                f"{ctx.user.mention} choose True, {ctx.user.mention} is correct!"
+            )
+        else:
+            await ctx.send(
+                f"{ctx.user.mention} choose True. Sorry, but the correct answer was {correct_trivia_answer}."
+            )
+
+    elif ctx.custom_id == "button_false":
+        if correct_trivia_answer.lower() == "false":
+            await ctx.send(
+                f"{ctx.user.mention} choose False, {ctx.user.mention} is correct!"
+            )
+        else:
+            await ctx.send(
+                f"{ctx.user.mention} choose False. Sorry, but the correct answer was {correct_trivia_answer}."
+            )
 
 
-@component_callback("math_trivia_button_false")
-async def math_trivia_button_false(ctx: ComponentContext):
-    if correct_trivia_answer.lower() == "false":
-        await ctx.send(
-            f"{ctx.user.mention} choose False, {ctx.user.mention} is correct!"
-        )
-    else:
-        await ctx.send(
-            f"{ctx.user.mention} choose False. Sorry, but the correct answer was {correct_trivia_answer}"
-        )
-
-
-@slash_command(
-    name="animetrivia",
-    description="Play a random animal trivia game.",
+@slash_command(name="convertticks", description="Convert ticks to seconds.")
+@slash_option(
+    opt_type=OptionType.INTEGER,
+    name="value",
+    description="Enter the value.",
+    required=True,
 )
-async def animetrivia(ctx: SlashContext):
-    global correct_trivia_answer
-    anime_trivia = bot_req.get_anime_trivia()
-    await ctx.send(
-        html.unescape(f"{anime_trivia[0]} | The difficulty is {anime_trivia[1]}.")
-    )
-
-    components = list[ActionRow] = [
-        ActionRow(
-            Button(
-                style=ButtonStyle.PRIMARY,
-                custom_id="anime_trivia_button_true",
-                label="True",
-            ),
-            Button(
-                style=ButtonStyle.DANGER,
-                custom_id="anime_trivia_button_false",
-                label="False",
-            ),
-        )
-    ]
-    await ctx.send(
-        f"Please choose an answer {ctx.user.mention}, on whether you think that is true or false.",
-        components=components,
-        ephemeral=True,
-    )
-    correct_trivia_answer = anime_trivia[2]
+async def convertticks(ctx: SlashContext, value: int):
+    convert = (
+        value * 0.015
+    )  # Converting ticks to seconds; 1 tick is equal to 0.015 seconds.
+    await ctx.send(f"{value} ticks is equal to {convert} seconds.")
 
 
-@component_callback("anime_trivia_button_true")
-async def anime_trivia_button_true(ctx: ComponentContext):
-    if correct_trivia_answer.lower() == "true":
-        await ctx.send(
-            f"{ctx.user.mention} choose True, {ctx.user.mention} is correct!"
-        )
-    else:
-        await ctx.send(
-            f"{ctx.user.mention} choose True. Sorry, but the correct answer was {correct_trivia_answer}"
-        )
-
-
-@component_callback("anime_trivia_button_false")
-async def anime_trivia_button_false(ctx: ComponentContext):
-    if correct_trivia_answer.lower() == "false":
-        await ctx.send(
-            f"{ctx.user.mention} choose False, {ctx.user.mention} is correct!"
-        )
-    else:
-        await ctx.send(
-            f"{ctx.user.mention} choose False. Sorry, but the correct answer was {correct_trivia_answer}"
-        )
+@slash_command(name="convertseconds", description="Convert seconds to ticks.")
+@slash_option(
+    opt_type=OptionType.NUMBER,
+    name="value",
+    description="Enter the value in seconds.",
+    required=True,
+)
+async def convertseconds(ctx: SlashContext, value: float):
+    convert = value / 0.015
+    await ctx.send(f"{value} seconds is equal to {int(convert)} ticks.")
 
 
 # This opens up if you right-click a message and choose Apps.
@@ -426,10 +372,10 @@ async def ping(ctx: ContextMenuContext):
     await ctx.send(COMMANDS)
 
 
-@message_context_menu(name="Quickstart (message)")
+@message_context_menu(name="Quickstart")
 async def quickstart_message(ctx: ContextMenuContext):
     await ctx.send(
-        f"Hello there {ctx.user.mention}! Thank you for using XnonBot on discord. You can either use `/help` or `$help` to prompt all the available commands for this bot.",
+        f"Hello there {ctx.user.mention}! Thank you for using XnonBot on discord. You can use `/help` to prompt all the available commands for this bot.",
         ephemeral=True,
     )
 
@@ -441,12 +387,5 @@ async def ping(ctx: ContextMenuContext):
     await ctx.send(f"Pong {member.mention}!")
 
 
-@user_context_menu(name="Quickstart (user)")
-async def quickstart_usere(ctx: ContextMenuContext):
-    await ctx.send(
-        f"Hello there {ctx.user.mention}! Thank you for using XnonBot on discord. You can either use `/help` or `$help` to prompt all the available commands for this bot.",
-        ephemeral=True,
-    )
-
-
-bot.start(getenv("XNONBOTTOKEN"))
+# Actually running the bot, change the token with yours if you want to run this bot for yourself.
+bot.start(os.getenv("XNONBOTTOKEN"))

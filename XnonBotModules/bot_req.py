@@ -35,65 +35,25 @@ def get_waifu_pic(arg):
     return waifu_pic
 
 
-def get_animal_trivia():
-    animal_trivia_response = requests.get(
-        "https://opentdb.com/api.php?amount=1&category=27&type=boolean"
-    )
-    animal_trivia_convert_json = json.loads(animal_trivia_response.text)
-    animal_trivia_question = animal_trivia_convert_json["results"][0]["question"]
-    animal_trivia_difficulty = animal_trivia_convert_json["results"][0]["difficulty"]
-    animal_trivia_correct_answer = animal_trivia_convert_json["results"][0][
-        "correct_answer"
-    ]
-    animal_trivia_incorrect_answer = animal_trivia_convert_json["results"][0][
-        "incorrect_answers"
-    ]
-    return (
-        animal_trivia_question,
-        animal_trivia_difficulty,
-        animal_trivia_correct_answer,
-        animal_trivia_incorrect_answer,
-    )
-
-
-def get_math_trivia():
-    math_trivia_response = requests.get(
-        "https://opentdb.com/api.php?amount=1&category=19&type=boolean"
-    )
-    trivia_convert_json = json.loads(math_trivia_response.text)
-    math_trivia_question = trivia_convert_json["results"][0]["question"]
-    math_trivia_difficulty = trivia_convert_json["results"][0]["difficulty"]
-    math_trivia_correct_answer = trivia_convert_json["results"][0]["correct_answer"]
-    math_trivia_incorrect_answer = trivia_convert_json["results"][0][
-        "incorrect_answers"
-    ]
-    return (
-        math_trivia_question,
-        math_trivia_difficulty,
-        math_trivia_correct_answer,
-        math_trivia_incorrect_answer,
-    )
-
-
-def get_anime_trivia():
-    anime_trivia_response = requests.get(
-        "https://opentdb.com/api.php?amount=1&category=31&type=boolean"
-    )
-    anime_trivia_convert_json = json.loads(anime_trivia_response.text)
-    anime_trivia_question = anime_trivia_convert_json["results"][0]["question"]
-    anime_trivia_difficulty = anime_trivia_convert_json["results"][0]["difficulty"]
-    anime_trivia_correct_answer = anime_trivia_convert_json["results"][0][
-        "correct_answer"
-    ]
-    anime_trivia_incorrect_answer = anime_trivia_convert_json["results"][0][
-        "incorrect_answers"
-    ]
-    return (
-        anime_trivia_question,
-        anime_trivia_difficulty,
-        anime_trivia_correct_answer,
-        anime_trivia_incorrect_answer,
-    )
+def get_trivia(arg):
+    available_category = {
+        "animal": "https://opentdb.com/api.php?amount=1&category=27&type=boolean",
+        "math": "https://opentdb.com/api.php?amount=1&category=19&type=boolean",
+        "anime": "https://opentdb.com/api.php?amount=1&category=31&type=boolean",
+        "history": "https://opentdb.com/api.php?amount=1&category=23&type=boolean",
+        "geography": "https://opentdb.com/api.php?amount=1&category=22&type=boolean",
+        "art": "https://opentdb.com/api.php?amount=1&category=25&type=boolean",
+        "celebrity": "https://opentdb.com/api.php?amount=1&category=26&type=boolean",
+        "computers": "https://opentdb.com/api.php?amount=1&category=18&type=boolean",
+        "sports": "https://opentdb.com/api.php?amount=1&category=21&type=boolean",
+        "cartoons": "https://opentdb.com/api.php?amount=1&category=32&type=boolean",
+    }
+    trivia_response = requests.get(available_category.get(arg))
+    trivia_convert_json = json.loads(trivia_response.text)
+    trivia_question = trivia_convert_json["results"][0]["question"]
+    trivia_difficulty = trivia_convert_json["results"][0]["difficulty"]
+    trivia_correct_answer = trivia_convert_json["results"][0]["correct_answer"]
+    return trivia_question, trivia_difficulty, trivia_correct_answer
 
 
 def get_pexels_photos(query):
