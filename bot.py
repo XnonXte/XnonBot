@@ -13,7 +13,6 @@ from interactions import (
     slash_command,
     slash_option,
     SlashContext,
-    slash_option,
     OptionType,
     message_context_menu,
     user_context_menu,
@@ -23,12 +22,10 @@ from interactions import (
     Button,
     ButtonStyle,
 )
-from XnonBotModules import bot_req
+from XnonBotModules import bot_req, keep_alive
 from interactions.api.events import Component
 import os
-import dotenv
 
-dotenv.load_dotenv("C:\Programming\XnonBot\dev.env")
 bot = interactions.Client()
 
 COMMANDS = """
@@ -371,7 +368,7 @@ async def repeat(ctx: ContextMenuContext):
 
 
 @message_context_menu(name="Help")
-async def ping(ctx: ContextMenuContext):
+async def helpcmctx(ctx: ContextMenuContext):
     await ctx.send(COMMANDS)
 
 
@@ -391,4 +388,5 @@ async def ping(ctx: ContextMenuContext):
 
 
 # Actually running the bot, change the token with yours if you want to run this bot for yourself.
-bot.start(os.getenv("XNONBOTTOKEN"))
+keep_alive.keep_alive()
+bot.start(os.environ["XNONBOTTOKEN"])

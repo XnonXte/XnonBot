@@ -2,9 +2,6 @@ import requests
 import json
 import os
 from pexels_api import API
-from dotenv import load_dotenv
-
-load_dotenv("C:\Programming\XnonBot\dev.env")
 
 
 def get_quote():
@@ -57,7 +54,7 @@ def get_trivia(arg):
 
 
 def get_pexels_photos(query):
-    pexels_client_api = API(os.getenv("PEXELSAPI"))
+    pexels_client_api = API(os.environ["PEXELSAPI"])
     pexels_client_api.search(query, page=1, results_per_page=1)
     images = pexels_client_api.get_entries()
     for i in images:
