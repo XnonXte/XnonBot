@@ -326,11 +326,11 @@ async def on_component(event: Component):
     elif ctx.custom_id == "button_false":
         if correct_trivia_answer.lower() == "false":
             await ctx.send(
-                f"{ctx.user.mention} choose False, {ctx.user.mention} is correct!"
+                f"{ctx.user.mention} chooses False, {ctx.user.mention} is correct!"
             )
         else:
             await ctx.send(
-                f"{ctx.user.mention} choose False. Sorry, but the correct answer was {correct_trivia_answer}."
+                f"{ctx.user.mention} chooses False. Sorry, but the correct answer was {correct_trivia_answer}."
             )
 
 
