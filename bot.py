@@ -12,11 +12,14 @@ from XnonBotModules import bot_req, keep_alive
 from interactions.api.events import Component
 import os
 from interactions.client import const
+from dotenv import load_dotenv
 
-bot = ipy.Client()
+load_dotenv("C:\Programming\XnonBot\dev.env")
 
 # ! This is for fixing image embeds in ipy as of 23/05/2023.
 const.CLIENT_FEATURE_FLAGS["FOLLOWUP_INTERACTIONS_FOR_IMAGES"] = True
+
+bot = ipy.Client()
 
 COMMANDS = """
 List of avalaible commands (prompted using </> command):
@@ -161,7 +164,7 @@ async def quote(ctx: ipy.SlashContext):
 @ipy.slash_option(
     opt_type=ipy.OptionType.STRING,
     name="category",
-    description="Enter the category (e.g. 'waifu', refer to https://waifu.pics/docs for more information!)",
+    description="Enter the category (e.g. waifu, refer to https://waifu.pics/docs for more information.)",
     required=True,
 )
 async def waifu(ctx: ipy.SlashContext, category: str):
@@ -253,11 +256,11 @@ async def pexels(ctx: ipy.SlashContext, search_query: str):
 @ipy.slash_option(
     opt_type=ipy.OptionType.STRING,
     name="category",
-    description="Choose a category (e.g. 'animal', refer to github for the list of available trivia categories.)).",
+    description="Choose a category (e.g. animal, refer to GitHub for the available trivia categories.)).",
     required=True,
 )
 async def trivia(ctx: ipy.SlashContext, category: str):
-    if category not in trivia_category_list:
+    if category.lower() not in trivia_category_list:
         await ctx.send(
             "Invalid category, please try again! (Please refer to the GitHub page for the available categories).",
             ephemeral=True,
@@ -265,7 +268,7 @@ async def trivia(ctx: ipy.SlashContext, category: str):
         return
 
     global trivia_button_true, trivia_button_false, trivia_message, correct_trivia_answer  # We're using the global keyword to store the necesarry variables globally since it's necesarry to have them in later decorator.
-    trivia_question = bot_req.get_trivia(category)
+    trivia_question = bot_req.get_trivia(category.lower())
     correct_trivia_answer = trivia_question[2]
 
     await ctx.send(
@@ -372,6 +375,6 @@ async def ping(ctx: ipy.ContextMenuContext):
     await ctx.send(f"Pong {member.mention}!")
 
 
-# Actually running the bot, change the token with yours if you want to run this bot for yourself.
-keep_alive.keep_alive()
+# * Actually running the bot, change the token with yours if you want to run this bot for yourself.
+# keep_alive.keep_alive()
 bot.start(os.environ["XNONBOTTOKEN"])
