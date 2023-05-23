@@ -1,28 +1,25 @@
-# XnonBot Version Beta 0.3
-# Migrated to discord-py-interactions version 5x
-# * Fixed the issue with pressing buttons.
-# * Added a lot more comments.
-# todo All of the slash commands should be in different file with classes and stuff, I should do OOP better lol.
+# XnonBot Version 0.3.5
+# Migrated from interactions.py to py-cord (hopefully it's a lot more stable!)
 # ? Add to ITB when?
-
-import interactions as ipy
+import discord
 import random
-import html
-from XnonBotModules import bot_req, keep_alive
-from interactions.api.events import Component
-import os
-from interactions.client import const
 from dotenv import load_dotenv
+import os
+from XnonBotModules import bot_req, keep_alive
+import html
 
 load_dotenv("C:\Programming\XnonBot\dev.env")
+TOKEN = os.getenv("XNONBOTTOKEN")
 
-# ! This is for fixing image embeds in ipy as of 23/05/2023.
-const.CLIENT_FEATURE_FLAGS["FOLLOWUP_INTERACTIONS_FOR_IMAGES"] = True
+bot = discord.Bot(message_prefix=";", intents=discord.Intents.all())
 
-bot = ipy.Client()
+# Creating an instance of several subcommand groups that we'll use later.
+game = bot.create_group("game")
+generate = bot.create_group("generate")
+utility = bot.create_group("utility")
 
 COMMANDS = """
-List of avalaible commands (prompted using </> command):
+List of available commands:
 
 `help` - Send a list of available slash commands
 `github` - Send the GitHub page for this bot
@@ -37,28 +34,14 @@ List of avalaible commands (prompted using </> command):
 `waifu` - Send a random waifu picture (it's SFW!)
 `pexels` - Search an image on pexels.com
 `trivia` - Send a random  trivia question and asking the user whether it's true or false
-`convertticks` - Convert ticks to seconds.
-`convertseconds` - Convert seconds to ticks.
+`convertticks` - Convert ticks to seconds
+`convertseconds` - Convert seconds to ticks
+`latency` - Check the bot's latency
 
-There's also a couple of context menus that you'd have to look up by yourself. Have fun using the bot!
+Several commands are grouped into several subgroups as of 24/05/2023 (update 0.3.5).
 """
 
-# Also available on the Github page.
-trivia_category_list = [
-    "animal",
-    "anime",
-    "math",
-    "history",
-    "geography",
-    "art",
-    "celebrity",
-    "computers",
-    "sports",
-    "cartoons",
-]
-
-# Up-to-date as of 19/05/2023
-waifu_category_list = (
+waifu_tuple = (
     "waifu",
     "neko",
     "shinobu",
@@ -91,290 +74,254 @@ waifu_category_list = (
     "dance",
     "cringe",
 )
+trivia_list = [
+    "animal",
+    "anime",
+    "math",
+    "history",
+    "geography",
+    "art",
+    "celebrity",
+    "computers",
+    "sports",
+    "cartoons",
+]
 
 
-@ipy.listen()
-async def on_startup():  # We're using on_startup() instead of on_ready() because of interactions.py version 5, but both are mostly the same.
-    print(f"The bot is running as {bot.user}!")
-    print(
-        """
- __   __                  ____        _   
- \ \ / /                 |  _ \      | |  
-  \ V / _ __   ___  _ __ | |_) | ___ | |_ 
-   > < | '_ \ / _ \| '_ \|  _ < / _ \| __|
-  / . \| | | | (_) | | | | |_) | (_) | |_ 
- /_/ \_\_| |_|\___/|_| |_|____/ \___/ \__|
-                                          
-                                          
-"""
+class TriviaComponents(discord.ui.View):  # discord.ui.view subclass for /trivia game.
+    @discord.ui.button(
+        label="True",
+        row=0,
+        style=discord.ButtonStyle.primary,
+        emoji="✅",
+        disabled=False,
     )
-    print(
-        "This bot is developed by XnonXte, refer to my GitHub for contact information. Enjoy using the bot!"
+    async def trivia_button_true_callback(self, button, interaction):
+        for child in self.children:
+            child.disabled = True
+            child.label = "Button disabled, no more pressing!"
+        await interaction.response.edit_message(view=self)
+
+        if correct_trivia_answer.lower() == "true":
+            await interaction.followup.send(
+                f"{interaction.user.mention} chooses True, they're correct!"  # We're using followup.send() because we can't have interaction.response twice in the same function.
+            )
+        else:
+            await interaction.followup.send(
+                f"Sorry {interaction.user.mention}, but the answer is {correct_trivia_answer}"
+            )
+
+    @discord.ui.button(
+        label="False",
+        row=0,
+        style=discord.ButtonStyle.danger,
+        emoji="🚫",
+        disabled=False,
+    )
+    async def trivia_button_false_callback(self, button, interaction):
+        for child in self.children:
+            child.disabled = True
+            child.label = "Button disabled, no more pressing!"
+        await interaction.response.edit_message(view=self)
+
+        if correct_trivia_answer.lower() == "false":
+            await interaction.followup.send(
+                f"{interaction.user.mention} chooses False, they're correct!"
+            )
+        else:
+            await interaction.followup.send(
+                f"Sorry {interaction.user.mention}, but the answer is {correct_trivia_answer}"
+            )
+
+
+# Prefixed commands.
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+
+    if message.content.startswith(";help"):
+        await message.channel.send(COMMANDS)
+
+
+# * From onward we'll be using a lot of interaction messages prompted using slash command.
+# General subcommand group.
+@bot.event
+async def on_ready():
+    print(f"We have logged in as {bot.user}!")
+
+
+@bot.command(description="Say hello to the user.")
+async def hello(ctx):
+    await ctx.respond(f"Hello {ctx.user.mention}!")
+
+
+@bot.command(description="Send a list of available slash commands.")
+async def help(ctx):
+    await ctx.respond(COMMANDS)
+
+
+@bot.slash_command(description="Tell the bot to say something.")
+async def say(ctx, message: discord.Option(str, description="Message to send.")):
+    await ctx.respond(f"{ctx.user.mention} said: `{message}`")
+
+
+@bot.command(description="Send the information about this bot.")
+async def about(ctx):
+    await ctx.respond(
+        "I'm a chat-bot developed by XnonXte! My code is available on GitHub (/github)."
     )
 
 
-# Every functions starting with the @slash_command decorator will be able to be prompted with </> command on discord.
-@ipy.slash_command(name="hello", description="Say hello to the user.")
-async def hello(ctx: ipy.SlashContext):
-    await ctx.send(f"Hello there {ctx.user.mention}!")
+@bot.command(description="Choose a random dice roll (1 to 6).")
+async def roll(ctx):
+    await ctx.respond(random.randint(1, 6))
 
 
-@ipy.slash_command(name="help", description="Send a list of available slash commands.")
-async def help(ctx: ipy.SlashContext):
-    await ctx.send(COMMANDS)
+@bot.command(description="Official GitHub page for this bot.")
+async def github(ctx):
+    await ctx.respond("https://github.com/XnonXte/XnonBot/")
 
 
-# In this instance, we're using @slash_option to make an option for our slash command, we'll be using much of this later on.
-@ipy.slash_command(name="say", description="Tell the bot to say something.")
-@ipy.slash_option(
-    opt_type=ipy.OptionType.STRING,
-    name="message",
-    description="Message to send",
-    required=True,
-)
-async def say(ctx: ipy.SlashContext, message: str):
-    await ctx.send(f"{ctx.user.mention} said: `{message}`")
-
-
-@ipy.slash_command(name="about", description="Send the information about this bot.")
-async def about(ctx: ipy.SlashContext):
-    await ctx.send("As the name implies, I'm a simple chatbot created by XnonXte!")
-
-
-@ipy.slash_command(name="roll", description="Choose a random dice roll (1 to 6).")
-async def roll(ctx: ipy.SlashContext):
-    await ctx.send(random.randint(1, 6))
-
-
-@ipy.slash_command(name="github", description="Send the github page for this bot.")
-async def github(ctx: ipy.SlashContext):
-    await ctx.send("https://github.com/XnonXte/XnonBot")
-
-
-@ipy.slash_command(name="quote", description="Get a random quote from zenquotes.io")
-async def quote(ctx: ipy.SlashContext):
+# Generate subcommand group.
+@generate.command(description="Get a random quote from zenquotes.io")
+async def quote(ctx):
     quote = bot_req.get_quote()
-    await ctx.send(quote)
+    await ctx.respond(quote)
 
 
-@ipy.slash_command(
-    name="waifu",
-    description="Get a random waifu picture from https://waifu.pics/docs (it's SFW don't worry!)",
+@generate.command(
+    description="Get a random waifu picture from https://waifu.pics/docs/ (It's SFW!)"
 )
-@ipy.slash_option(
-    opt_type=ipy.OptionType.STRING,
-    name="category",
-    description="Enter the category (e.g. waifu, refer to https://waifu.pics/docs for more information.)",
-    required=True,
-)
-async def waifu(ctx: ipy.SlashContext, category: str):
-    if (
-        category not in waifu_category_list
-    ):  # If the category that the user is inputting doesn't exist, we're using ephemeral=True so it's only viewable by the user.
-        await ctx.send("Please enter a valid category!", ephemeral=True)
+async def waifu(
+    ctx,
+    category: discord.Option(
+        str,
+        description="Select the category (e.g. waifu, please refer to https://waifu.pics/docs/ for more categories!)",
+    ),
+):
+    if category not in waifu_tuple:
+        await ctx.respond("Please enter a valid category!", ephemeral=True)
         return
     else:
         waifu_pic = bot_req.get_waifu_pic(category)
-        await ctx.send(waifu_pic)
+        await ctx.respond(waifu_pic)
 
 
-@ipy.slash_command(
-    name="dog", description="Get a random dog picture from https://dog.ceo/dog-api"
-)
-async def dog(ctx: ipy.SlashContext):
+@generate.command(description="Get a random dog picture from https://dog.ceo/dog-api/")
+async def dog(ctx):
     dog = bot_req.get_dog_pic()
-    await ctx.send(dog)
+    await ctx.respond(dog)
 
 
-@ipy.slash_command(
-    name="cat", description="Get a random cat picture from https://thecatapi.com"
-)
-async def cat(ctx: ipy.SlashContext):
+@generate.command(description="Get a random cat picture from https://thecatapi.com/")
+async def cat(ctx):
     cat = bot_req.get_cat_pic()
-    await ctx.send(cat)
+    await ctx.respond(cat)
 
 
-@ipy.slash_command(name="rps", description="Play rock, paper, scissors with the user.")
-@ipy.slash_option(
-    opt_type=ipy.OptionType.STRING,
-    name="choice",
-    description="Enter your choice (rock, paper, scissors).",
-    required=True,
-)
-async def rps(ctx: ipy.SlashContext, choice: str):
+@generate.command(description="Search an image on pexels.com")
+async def pexels(
+    ctx, search_query: discord.Option(str, description="Image to search.")
+):
+    image_output = bot_req.get_pexels_photos(search_query)
+    await ctx.send(f"Here's a(n) {search_query} image for you! {image_output[2]}")
+
+
+# Utility subcommand group
+@utility.command(description="Send the bot's latency.")
+async def latency(ctx):
+    await ctx.respond(f"Pong! My latency is {round(bot.latency * 100, 2)}ms.")
+
+
+@utility.command(description="Convert ticks to seconds.")
+async def convertticks(
+    ctx, value: discord.Option(str, description="Enter the value in ticks.")
+):
+    convert = value * 0.015
+    await ctx.respond(f"{value} ticks is equal to {convert} seconds.")
+
+
+@utility.command(description="Convert seconds to ticks.")
+async def convertseconds(
+    ctx, value: discord.Option(float, description="Enter the value in seconds.")
+):
+    convert = value / 0.015
+    await ctx.respond(f"{value} seconds is equal to {int(convert)} ticks.")
+
+
+# Game subcommand group.
+@game.command(description="Play rock, paper, scissors with the user.")
+async def rps(
+    ctx,
+    choice: discord.Option(str, description="Choose either rock, paper, or scissors."),
+):
     choices = ("rock", "paper", "scissors")
     bot_choice = random.choice(choices)
 
     if choice not in choices:
-        await ctx.send(
+        await ctx.respond(
             "Invalid choice. Please choose either rock, paper, or scissors!",
             ephemeral=True,
         )
         return
 
     if choice == bot_choice:
-        await ctx.send(
-            f"{ctx.user.mention} chose {choice}. I chose {bot_choice}. We tied!"
+        await ctx.respond(
+            f"{ctx.user.mention} chooses {choice}. I choose {bot_choice}. We tied!"
         )
     elif choice == "rock" and bot_choice == "scissors":
-        await ctx.send(
-            f"{ctx.user.mention} chose {choice}. I chose {bot_choice}. {ctx.user.mention} won!"
+        await ctx.respond(
+            f"{ctx.user.mention} chooses {choice}. I choose {bot_choice}. {ctx.user.mention} won!"
         )
     elif choice == "scissors" and bot_choice == "paper":
-        await ctx.send(
-            f"{ctx.user.mention} chose {choice}. I chose {bot_choice}. {ctx.user.mention} won!"
+        await ctx.respond(
+            f"{ctx.user.mention} chooses {choice}. I choose {bot_choice}. {ctx.user.mention} won!"
         )
     elif choice == "paper" and bot_choice == "rock":
-        await ctx.send(
-            f"{ctx.user.mention} chose {choice}. I chose {bot_choice}. {ctx.user.mention} won!"
+        await ctx.respond(
+            f"{ctx.user.mention} chooses {choice}. I choose {bot_choice}. {ctx.user.mention} won!"
         )
     else:
-        await ctx.send(
-            f"{ctx.user.mention} chose {choice}. I chose {bot_choice}. I won!"
+        await ctx.respond(
+            f"{ctx.user.mention} chooses {choice}. I choose {bot_choice}. I won!"
         )
 
 
-@ipy.slash_command(name="pexels", description="Search an image on pexels.com")
-@ipy.slash_option(
-    opt_type=ipy.OptionType.STRING,
-    name="search_query",
-    description="Image to search",
-    required=True,
-)
-async def pexels(ctx: ipy.SlashContext, search_query: str):
-    image_output = bot_req.get_pexels_photos(search_query)
-    await ctx.send(
-        f"An image of {search_query} has been generated! Photographed by: {image_output[0]}, original link: {image_output[2]} - Powered by pexels.com"
-    )
-
-
-@ipy.slash_command(
-    name="trivia",
-    description="Play a trivia game (database from https://opentdb.com/).",
-    scopes=[1103578001318346812],
-)
-@ipy.slash_option(
-    opt_type=ipy.OptionType.STRING,
-    name="category",
-    description="Choose a category (e.g. animal, refer to GitHub for the available trivia categories.)).",
-    required=True,
-)
-async def trivia(ctx: ipy.SlashContext, category: str):
-    if category.lower() not in trivia_category_list:
-        await ctx.send(
-            "Invalid category, please try again! (Please refer to the GitHub page for the available categories).",
+@game.command(description="Play a trivia game from https://opentdb.com/")
+async def trivia(
+    ctx,
+    category: discord.Option(
+        str,
+        description="Choose the category (e.g. animal, refer to the GitHub page for more categories)",
+    ),
+):
+    if category.lower() not in trivia_list:
+        await ctx.respond(
+            "Invalid category, please try again. (It is highly encouraged to refer to the GitHub page for the available categories!)",
             ephemeral=True,
         )
         return
 
-    global trivia_button_true, trivia_button_false, trivia_message, correct_trivia_answer  # We're using the global keyword to store the necesarry variables globally since it's necesarry to have them in later decorator.
+    global correct_trivia_answer
     trivia_question = bot_req.get_trivia(category.lower())
     correct_trivia_answer = trivia_question[2]
 
-    await ctx.send(
-        html.unescape(f"{trivia_question[0]} | The difficulty is {trivia_question[1]}")
+    await ctx.respond(
+        html.unescape(f"The difficulty is {trivia_question[1]} - {trivia_question[0]}")
     )
 
-    trivia_button_true = ipy.Button(
-        style=ipy.ButtonStyle.PRIMARY,
-        label="True",
-        custom_id="button_true",
-        disabled=False,
-    )
-    trivia_button_false = ipy.Button(
-        style=ipy.ButtonStyle.DANGER,
-        label="False",
-        custom_id="button_false",
-        disabled=False,
-    )
-
-    trivia_message = await ctx.send(
-        f"Please choose your answer {ctx.user.mention}.",
-        components=[trivia_button_true, trivia_button_false],
+    await ctx.respond(
+        f"Please select your answer down below!",
+        view=TriviaComponents(),
     )
 
 
-@ipy.listen()
-async def on_component(event: Component):
-    ctx = event.ctx
-
-    if (
-        ctx.client != event.client
-    ):  # Check if the user pressing the button is the same person as the one requesting them; otherwise, return ().
-        return
-
-    trivia_button_true.disabled = trivia_button_false.disabled = True
-    await trivia_message.edit(components=[trivia_button_true, trivia_button_false])
-
-    if ctx.custom_id == "button_true":
-        if correct_trivia_answer.lower() == "true":
-            await ctx.send(
-                f"{ctx.user.mention} choose True, {ctx.user.mention} is correct!"
-            )
-        else:
-            await ctx.send(
-                f"{ctx.user.mention} choose True. Sorry, but the correct answer was {correct_trivia_answer}."
-            )
-
-    elif ctx.custom_id == "button_false":
-        if correct_trivia_answer.lower() == "false":
-            await ctx.send(
-                f"{ctx.user.mention} chooses False, {ctx.user.mention} is correct!"
-            )
-        else:
-            await ctx.send(
-                f"{ctx.user.mention} chooses False. Sorry, but the correct answer was {correct_trivia_answer}."
-            )
+# Context menus.
+@bot.user_command(name="Ping", description="Ping the user.")
+async def ping(ctx, member: discord.Member):
+    ctx.respond(f"Pong {member.mention}!")
 
 
-@ipy.slash_command(name="convertticks", description="Convert ticks to seconds.")
-@ipy.slash_option(
-    opt_type=ipy.OptionType.INTEGER,
-    name="value",
-    description="Enter the value.",
-    required=True,
-)
-async def convertticks(ctx: ipy.SlashContext, value: int):
-    convert = (
-        value * 0.015
-    )  # Converting ticks to seconds; 1 tick is equal to 0.015 seconds.
-    await ctx.send(f"{value} ticks is equal to {convert} seconds.")
-
-
-@ipy.slash_command(name="convertseconds", description="Convert seconds to ticks.")
-@ipy.slash_option(
-    opt_type=ipy.OptionType.NUMBER,
-    name="value",
-    description="Enter the value in seconds.",
-    required=True,
-)
-async def convertseconds(ctx: ipy.SlashContext, value: float):
-    convert = value / 0.015
-    await ctx.send(f"{value} seconds is equal to {int(convert)} ticks.")
-
-
-# This opens up if you right-click a message and choose Apps.
-@ipy.message_context_menu(name="Repeat")
-async def repeat(ctx: ipy.ContextMenuContext):
-    message: ipy.Message = ctx.target
-    await ctx.send(message.content)
-
-
-@ipy.message_context_menu(name="Quickstart")
-async def quickstart(ctx: ipy.ContextMenuContext):
-    await ctx.send(
-        f"Hello there {ctx.user.mention}! Thank you for using XnonBot on discord. You can use `/help` to prompt all the available commands for this bot.",
-        ephemeral=True,
-    )
-
-
-# This opens up if you right-click a user and choose Apps.
-@ipy.user_context_menu(name="Ping")
-async def ping(ctx: ipy.ContextMenuContext):
-    member: ipy.Member = ctx.target
-    await ctx.send(f"Pong {member.mention}!")
-
-
-# * Actually running the bot, change the token with yours if you want to run this bot for yourself.
 # keep_alive.keep_alive()
-bot.start(os.environ["XNONBOTTOKEN"])
+bot.run(TOKEN)
