@@ -6,7 +6,7 @@ app = Flask("")
 
 @app.route("/")
 def main():
-    return "XnonBot is alive!"
+    return "XnonBot#8699 is alive!"
 
 
 def run():

@@ -5,28 +5,18 @@
 # todo All of the slash commands should be in different file with classes and stuff, I should do OOP better lol.
 # ? Add to ITB when?
 
-import interactions
+import interactions as ipy
 import random
 import html
-from interactions import (
-    listen,
-    slash_command,
-    slash_option,
-    SlashContext,
-    OptionType,
-    message_context_menu,
-    user_context_menu,
-    ContextMenuContext,
-    Message,
-    Member,
-    Button,
-    ButtonStyle,
-)
 from XnonBotModules import bot_req, keep_alive
 from interactions.api.events import Component
 import os
+from interactions.client import const
 
-bot = interactions.Client()
+bot = ipy.Client()
+
+# ! This is for fixing image embeds in ipy as of 23/05/2023.
+const.CLIENT_FEATURE_FLAGS["FOLLOWUP_INTERACTIONS_FOR_IMAGES"] = True
 
 COMMANDS = """
 List of avalaible commands (prompted using </> command):
@@ -100,7 +90,7 @@ waifu_category_list = (
 )
 
 
-@listen()
+@ipy.listen()
 async def on_startup():  # We're using on_startup() instead of on_ready() because of interactions.py version 5, but both are mostly the same.
     print(f"The bot is running as {bot.user}!")
     print(
@@ -121,60 +111,60 @@ async def on_startup():  # We're using on_startup() instead of on_ready() becaus
 
 
 # Every functions starting with the @slash_command decorator will be able to be prompted with </> command on discord.
-@slash_command(name="hello", description="Say hello to the user.")
-async def hello(ctx: SlashContext):
+@ipy.slash_command(name="hello", description="Say hello to the user.")
+async def hello(ctx: ipy.SlashContext):
     await ctx.send(f"Hello there {ctx.user.mention}!")
 
 
-@slash_command(name="help", description="Send a list of available slash commands.")
-async def help(ctx: SlashContext):
+@ipy.slash_command(name="help", description="Send a list of available slash commands.")
+async def help(ctx: ipy.SlashContext):
     await ctx.send(COMMANDS)
 
 
 # In this instance, we're using @slash_option to make an option for our slash command, we'll be using much of this later on.
-@slash_command(name="say", description="Tell the bot to say something.")
-@slash_option(
-    opt_type=OptionType.STRING,
+@ipy.slash_command(name="say", description="Tell the bot to say something.")
+@ipy.slash_option(
+    opt_type=ipy.OptionType.STRING,
     name="message",
     description="Message to send",
     required=True,
 )
-async def say(ctx: SlashContext, message: str):
+async def say(ctx: ipy.SlashContext, message: str):
     await ctx.send(f"{ctx.user.mention} said: `{message}`")
 
 
-@slash_command(name="about", description="Send the information about this bot.")
-async def about(ctx: SlashContext):
+@ipy.slash_command(name="about", description="Send the information about this bot.")
+async def about(ctx: ipy.SlashContext):
     await ctx.send("As the name implies, I'm a simple chatbot created by XnonXte!")
 
 
-@slash_command(name="roll", description="Choose a random dice roll (1 to 6).")
-async def roll(ctx: SlashContext):
+@ipy.slash_command(name="roll", description="Choose a random dice roll (1 to 6).")
+async def roll(ctx: ipy.SlashContext):
     await ctx.send(random.randint(1, 6))
 
 
-@slash_command(name="github", description="Send the github page for this bot.")
-async def github(ctx: SlashContext):
+@ipy.slash_command(name="github", description="Send the github page for this bot.")
+async def github(ctx: ipy.SlashContext):
     await ctx.send("https://github.com/XnonXte/XnonBot")
 
 
-@slash_command(name="quote", description="Get a random quote from zenquotes.io")
-async def quote(ctx: SlashContext):
+@ipy.slash_command(name="quote", description="Get a random quote from zenquotes.io")
+async def quote(ctx: ipy.SlashContext):
     quote = bot_req.get_quote()
     await ctx.send(quote)
 
 
-@slash_command(
+@ipy.slash_command(
     name="waifu",
     description="Get a random waifu picture from https://waifu.pics/docs (it's SFW don't worry!)",
 )
-@slash_option(
-    opt_type=OptionType.STRING,
+@ipy.slash_option(
+    opt_type=ipy.OptionType.STRING,
     name="category",
     description="Enter the category (e.g. 'waifu', refer to https://waifu.pics/docs for more information!)",
     required=True,
 )
-async def waifu(ctx: SlashContext, category: str):
+async def waifu(ctx: ipy.SlashContext, category: str):
     if (
         category not in waifu_category_list
     ):  # If the category that the user is inputting doesn't exist, we're using ephemeral=True so it's only viewable by the user.
@@ -185,30 +175,30 @@ async def waifu(ctx: SlashContext, category: str):
         await ctx.send(waifu_pic)
 
 
-@slash_command(
+@ipy.slash_command(
     name="dog", description="Get a random dog picture from https://dog.ceo/dog-api"
 )
-async def dog(ctx: SlashContext):
+async def dog(ctx: ipy.SlashContext):
     dog = bot_req.get_dog_pic()
     await ctx.send(dog)
 
 
-@slash_command(
+@ipy.slash_command(
     name="cat", description="Get a random cat picture from https://thecatapi.com"
 )
-async def cat(ctx: SlashContext):
+async def cat(ctx: ipy.SlashContext):
     cat = bot_req.get_cat_pic()
     await ctx.send(cat)
 
 
-@slash_command(name="rps", description="Play rock, paper, scissors with the user.")
-@slash_option(
-    opt_type=OptionType.STRING,
+@ipy.slash_command(name="rps", description="Play rock, paper, scissors with the user.")
+@ipy.slash_option(
+    opt_type=ipy.OptionType.STRING,
     name="choice",
     description="Enter your choice (rock, paper, scissors).",
     required=True,
 )
-async def rps(ctx: SlashContext, choice: str):
+async def rps(ctx: ipy.SlashContext, choice: str):
     choices = ("rock", "paper", "scissors")
     bot_choice = random.choice(choices)
 
@@ -241,32 +231,32 @@ async def rps(ctx: SlashContext, choice: str):
         )
 
 
-@slash_command(name="pexels", description="Search an image on pexels.com")
-@slash_option(
-    opt_type=OptionType.STRING,
+@ipy.slash_command(name="pexels", description="Search an image on pexels.com")
+@ipy.slash_option(
+    opt_type=ipy.OptionType.STRING,
     name="search_query",
     description="Image to search",
     required=True,
 )
-async def pexels(ctx: SlashContext, search_query: str):
+async def pexels(ctx: ipy.SlashContext, search_query: str):
     image_output = bot_req.get_pexels_photos(search_query)
     await ctx.send(
         f"An image of {search_query} has been generated! Photographed by: {image_output[0]}, original link: {image_output[2]} - Powered by pexels.com"
     )
 
 
-@slash_command(
+@ipy.slash_command(
     name="trivia",
     description="Play a trivia game (database from https://opentdb.com/).",
     scopes=[1103578001318346812],
 )
-@slash_option(
-    opt_type=OptionType.STRING,
+@ipy.slash_option(
+    opt_type=ipy.OptionType.STRING,
     name="category",
     description="Choose a category (e.g. 'animal', refer to github for the list of available trivia categories.)).",
     required=True,
 )
-async def trivia(ctx: SlashContext, category: str):
+async def trivia(ctx: ipy.SlashContext, category: str):
     if category not in trivia_category_list:
         await ctx.send(
             "Invalid category, please try again! (Please refer to the GitHub page for the available categories).",
@@ -282,14 +272,14 @@ async def trivia(ctx: SlashContext, category: str):
         html.unescape(f"{trivia_question[0]} | The difficulty is {trivia_question[1]}")
     )
 
-    trivia_button_true = Button(
-        style=ButtonStyle.PRIMARY,
+    trivia_button_true = ipy.Button(
+        style=ipy.ButtonStyle.PRIMARY,
         label="True",
         custom_id="button_true",
         disabled=False,
     )
-    trivia_button_false = Button(
-        style=ButtonStyle.DANGER,
+    trivia_button_false = ipy.Button(
+        style=ipy.ButtonStyle.DANGER,
         label="False",
         custom_id="button_false",
         disabled=False,
@@ -301,7 +291,7 @@ async def trivia(ctx: SlashContext, category: str):
     )
 
 
-@listen()
+@ipy.listen()
 async def on_component(event: Component):
     ctx = event.ctx
 
@@ -334,46 +324,41 @@ async def on_component(event: Component):
             )
 
 
-@slash_command(name="convertticks", description="Convert ticks to seconds.")
-@slash_option(
-    opt_type=OptionType.INTEGER,
+@ipy.slash_command(name="convertticks", description="Convert ticks to seconds.")
+@ipy.slash_option(
+    opt_type=ipy.OptionType.INTEGER,
     name="value",
     description="Enter the value.",
     required=True,
 )
-async def convertticks(ctx: SlashContext, value: int):
+async def convertticks(ctx: ipy.SlashContext, value: int):
     convert = (
         value * 0.015
     )  # Converting ticks to seconds; 1 tick is equal to 0.015 seconds.
     await ctx.send(f"{value} ticks is equal to {convert} seconds.")
 
 
-@slash_command(name="convertseconds", description="Convert seconds to ticks.")
-@slash_option(
-    opt_type=OptionType.NUMBER,
+@ipy.slash_command(name="convertseconds", description="Convert seconds to ticks.")
+@ipy.slash_option(
+    opt_type=ipy.OptionType.NUMBER,
     name="value",
     description="Enter the value in seconds.",
     required=True,
 )
-async def convertseconds(ctx: SlashContext, value: float):
+async def convertseconds(ctx: ipy.SlashContext, value: float):
     convert = value / 0.015
     await ctx.send(f"{value} seconds is equal to {int(convert)} ticks.")
 
 
 # This opens up if you right-click a message and choose Apps.
-@message_context_menu(name="Repeat")
-async def repeat(ctx: ContextMenuContext):
-    message: Message = ctx.target
+@ipy.message_context_menu(name="Repeat")
+async def repeat(ctx: ipy.ContextMenuContext):
+    message: ipy.Message = ctx.target
     await ctx.send(message.content)
 
 
-@message_context_menu(name="Help")
-async def helpcmctx(ctx: ContextMenuContext):
-    await ctx.send(COMMANDS)
-
-
-@message_context_menu(name="Quickstart")
-async def quickstart_message(ctx: ContextMenuContext):
+@ipy.message_context_menu(name="Quickstart")
+async def quickstart(ctx: ipy.ContextMenuContext):
     await ctx.send(
         f"Hello there {ctx.user.mention}! Thank you for using XnonBot on discord. You can use `/help` to prompt all the available commands for this bot.",
         ephemeral=True,
@@ -381,9 +366,9 @@ async def quickstart_message(ctx: ContextMenuContext):
 
 
 # This opens up if you right-click a user and choose Apps.
-@user_context_menu(name="Ping")
-async def ping(ctx: ContextMenuContext):
-    member: Member = ctx.target
+@ipy.user_context_menu(name="Ping")
+async def ping(ctx: ipy.ContextMenuContext):
+    member: ipy.Member = ctx.target
     await ctx.send(f"Pong {member.mention}!")
 
 
