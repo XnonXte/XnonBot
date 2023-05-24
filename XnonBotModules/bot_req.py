@@ -6,6 +6,52 @@ from dotenv import load_dotenv
 
 load_dotenv("C:\Programming\XnonBot\dev.env")
 
+waifu_tuple = (
+    "waifu",
+    "neko",
+    "shinobu",
+    "megumin",
+    "bully",
+    "cuddle",
+    "cry",
+    "hug",
+    "awoo",
+    "kiss",
+    "lick",
+    "pat",
+    "smug",
+    "bonk",
+    "yeet",
+    "blush",
+    "smile",
+    "wave",
+    "highfive",
+    "handhold",
+    "nom",
+    "bite",
+    "glomp",
+    "slap",
+    "kill",
+    "kick",
+    "happy",
+    "wink",
+    "poke",
+    "dance",
+    "cringe",
+)
+trivia_list = [
+    "animal",
+    "anime",
+    "math",
+    "history",
+    "geography",
+    "art",
+    "celebrity",
+    "computers",
+    "sports",
+    "cartoons",
+]
+
 
 def get_quote():
     quote_response = requests.get("https://zenquotes.io/api/random")
@@ -28,14 +74,22 @@ def get_cat_pic():
     return cat_pic
 
 
-def get_waifu_pic(arg):
-    waifu_response = requests.get(f"https://api.waifu.pics/sfw/{arg}")
+def get_waifu_pic(category):
+    if category not in waifu_tuple:
+        return None
+
+    waifu_response = requests.get(f"https://api.waifu.pics/sfw/{category}")
     waifu_convert_json = json.loads(waifu_response.text)
-    waifu_pic = f" Here's a random {arg} picture for you! " + waifu_convert_json["url"]
+    waifu_pic = (
+        f" Here's a random {category} picture for you! " + waifu_convert_json["url"]
+    )
     return waifu_pic
 
 
-def get_trivia(arg):
+def get_trivia(category):
+    if category not in trivia_list:
+        return None
+
     available_category = {
         "animal": "https://opentdb.com/api.php?amount=1&category=27&type=boolean",
         "math": "https://opentdb.com/api.php?amount=1&category=19&type=boolean",
@@ -48,7 +102,7 @@ def get_trivia(arg):
         "sports": "https://opentdb.com/api.php?amount=1&category=21&type=boolean",
         "cartoons": "https://opentdb.com/api.php?amount=1&category=32&type=boolean",
     }
-    trivia_response = requests.get(available_category.get(arg))
+    trivia_response = requests.get(available_category.get(category))
     trivia_convert_json = json.loads(trivia_response.text)
     trivia_question = trivia_convert_json["results"][0]["question"]
     trivia_difficulty = trivia_convert_json["results"][0]["difficulty"]

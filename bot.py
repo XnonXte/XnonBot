@@ -1,6 +1,5 @@
 # XnonBot Version 0.3.5
 # Migrated from interactions.py to py-cord (hopefully it's a lot more stable!)
-# ? Add to ITB when?
 import discord
 import random
 from dotenv import load_dotenv
@@ -11,7 +10,9 @@ import html
 load_dotenv("C:\Programming\XnonBot\dev.env")
 TOKEN = os.getenv("XNONBOTTOKEN")
 
-bot = discord.Bot(message_prefix=";", intents=discord.Intents.all())
+intents = discord.Intents.default()
+intents.message_content = True
+bot = discord.Bot(command_prefix=";", intents=intents)
 
 # Creating an instance of several subcommand groups that we'll use later.
 game = bot.create_group("game")
@@ -38,65 +39,28 @@ List of available commands:
 `convertseconds` - Convert seconds to ticks
 `latency` - Check the bot's latency
 
-Several commands are grouped into several subgroups as of 24/05/2023 (update 0.3.5).
+Several commands are grouped into several command subgroups as of 24/05/2023 (update 0.3.5).
 """
 
-waifu_tuple = (
-    "waifu",
-    "neko",
-    "shinobu",
-    "megumin",
-    "bully",
-    "cuddle",
-    "cry",
-    "hug",
-    "awoo",
-    "kiss",
-    "lick",
-    "pat",
-    "smug",
-    "bonk",
-    "yeet",
-    "blush",
-    "smile",
-    "wave",
-    "highfive",
-    "handhold",
-    "nom",
-    "bite",
-    "glomp",
-    "slap",
-    "kill",
-    "kick",
-    "happy",
-    "wink",
-    "poke",
-    "dance",
-    "cringe",
-)
-trivia_list = [
-    "animal",
-    "anime",
-    "math",
-    "history",
-    "geography",
-    "art",
-    "celebrity",
-    "computers",
-    "sports",
-    "cartoons",
-]
+
+"""Class for /trivia minigame"""
 
 
-class TriviaComponents(discord.ui.View):  # discord.ui.view subclass for /trivia game.
+class TriviaButtons(discord.ui.View):
     @discord.ui.button(
         label="True",
-        row=0,
         style=discord.ButtonStyle.primary,
         emoji="✅",
-        disabled=False,
     )
     async def trivia_button_true_callback(self, button, interaction):
+        if (
+            interaction.user != interaction.message.author
+        ):  # Check if the user pressing the button is the same one as the author.
+            await interaction.response.send_message(
+                "I wasn't asking you! To run another question, please send /trivia.",
+                ephemeral=True,
+            )
+            return
         for child in self.children:
             child.disabled = True
             child.label = "Button disabled, no more pressing!"
@@ -104,21 +68,25 @@ class TriviaComponents(discord.ui.View):  # discord.ui.view subclass for /trivia
 
         if correct_trivia_answer.lower() == "true":
             await interaction.followup.send(
-                f"{interaction.user.mention} chooses True, they're correct!"  # We're using followup.send() because we can't have interaction.response twice in the same function.
+                f"{interaction.user.mention} chooses True, {interaction.user.mention} is correct!"  # We're using followup.send() because we can't have interaction.response twice inside of the same function.
             )
         else:
             await interaction.followup.send(
-                f"Sorry {interaction.user.mention}, but the answer is {correct_trivia_answer}"
+                f"Sorry {interaction.user.mention}, but the answer is {correct_trivia_answer}."
             )
 
     @discord.ui.button(
         label="False",
-        row=0,
         style=discord.ButtonStyle.danger,
         emoji="🚫",
-        disabled=False,
     )
     async def trivia_button_false_callback(self, button, interaction):
+        if interaction.user != interaction.message.author:
+            await interaction.response.send_message(
+                "I wasn't asking you! To run another question, please send /trivia.",
+                ephemeral=True,
+            )
+            return
         for child in self.children:
             child.disabled = True
             child.label = "Button disabled, no more pressing!"
@@ -126,26 +94,17 @@ class TriviaComponents(discord.ui.View):  # discord.ui.view subclass for /trivia
 
         if correct_trivia_answer.lower() == "false":
             await interaction.followup.send(
-                f"{interaction.user.mention} chooses False, they're correct!"
+                f"{interaction.user.mention} chooses False, {interaction.user.mention} is correct!"
             )
         else:
             await interaction.followup.send(
-                f"Sorry {interaction.user.mention}, but the answer is {correct_trivia_answer}"
+                f"Sorry {interaction.user.mention}, but the answer is {correct_trivia_answer}."
             )
 
 
-# Prefixed commands.
-@bot.event
-async def on_message(message):
-    if message.author == bot.user:
-        return
-
-    if message.content.startswith(";help"):
-        await message.channel.send(COMMANDS)
+"""General subcommand group"""
 
 
-# * From onward we'll be using a lot of interaction messages prompted using slash command.
-# General subcommand group.
 @bot.event
 async def on_ready():
     print(f"We have logged in as {bot.user}!")
@@ -180,10 +139,12 @@ async def roll(ctx):
 
 @bot.command(description="Official GitHub page for this bot.")
 async def github(ctx):
-    await ctx.respond("https://github.com/XnonXte/XnonBot/")
+    await ctx.respond("https://github.com/XnonXte/XnonBot")
 
 
-# Generate subcommand group.
+"""Generate subcommand group"""
+
+
 @generate.command(description="Get a random quote from zenquotes.io")
 async def quote(ctx):
     quote = bot_req.get_quote()
@@ -191,30 +152,29 @@ async def quote(ctx):
 
 
 @generate.command(
-    description="Get a random waifu picture from https://waifu.pics/docs/ (It's SFW!)"
+    description="Get a random waifu picture from https://waifu.pics/docs (It's SFW!)"
 )
 async def waifu(
     ctx,
     category: discord.Option(
         str,
-        description="Select the category (e.g. waifu, please refer to https://waifu.pics/docs/ for more categories!)",
+        description="Select the category (e.g. waifu, please refer to https://waifu.pics/docs for more categories!)",
     ),
 ):
-    if category not in waifu_tuple:
-        await ctx.respond("Please enter a valid category!", ephemeral=True)
+    waifu_pic = bot_req.get_waifu_pic(category)
+    if waifu_pic is None:
+        await ctx.respond("Invalid value, please try again!", ephemeral=True)
         return
-    else:
-        waifu_pic = bot_req.get_waifu_pic(category)
-        await ctx.respond(waifu_pic)
+    await ctx.respond(waifu_pic)
 
 
-@generate.command(description="Get a random dog picture from https://dog.ceo/dog-api/")
+@generate.command(description="Get a random dog picture from https://dog.ceo/dog-api")
 async def dog(ctx):
     dog = bot_req.get_dog_pic()
     await ctx.respond(dog)
 
 
-@generate.command(description="Get a random cat picture from https://thecatapi.com/")
+@generate.command(description="Get a random cat picture from https://thecatapi.com")
 async def cat(ctx):
     cat = bot_req.get_cat_pic()
     await ctx.respond(cat)
@@ -224,14 +184,21 @@ async def cat(ctx):
 async def pexels(
     ctx, search_query: discord.Option(str, description="Image to search.")
 ):
-    image_output = bot_req.get_pexels_photos(search_query)
-    await ctx.send(f"Here's a(n) {search_query} image for you! {image_output[2]}")
+    try:
+        image_output = bot_req.get_pexels_photos(search_query)
+        await ctx.respond(
+            f"Here's a(n) {search_query} image for you! {image_output[2]}"
+        )
+    except Exception as e:
+        await ctx.respond(f"An error has been encountered: {e}", ephemeral=True)
 
 
-# Utility subcommand group
-@utility.command(description="Send the bot's latency.")
-async def latency(ctx):
-    await ctx.respond(f"Pong! My latency is {round(bot.latency * 100, 2)}ms.")
+"""Utility subcommand group"""
+
+
+@utility.command(description="Check the bot's latency.")
+async def ping(ctx):
+    await ctx.respond(f"Pong! My ping is {round(bot.latency * 100, 2)}ms.")
 
 
 @utility.command(description="Convert ticks to seconds.")
@@ -250,7 +217,9 @@ async def convertseconds(
     await ctx.respond(f"{value} seconds is equal to {int(convert)} ticks.")
 
 
-# Game subcommand group.
+"""Game subcommand group"""
+
+
 @game.command(description="Play rock, paper, scissors with the user.")
 async def rps(
     ctx,
@@ -296,15 +265,11 @@ async def trivia(
         description="Choose the category (e.g. animal, refer to the GitHub page for more categories)",
     ),
 ):
-    if category.lower() not in trivia_list:
-        await ctx.respond(
-            "Invalid category, please try again. (It is highly encouraged to refer to the GitHub page for the available categories!)",
-            ephemeral=True,
-        )
-        return
-
     global correct_trivia_answer
     trivia_question = bot_req.get_trivia(category.lower())
+    if trivia_question is None:
+        await ctx.respond("Invalid value, please try again!", ephemeral=True)
+        return
     correct_trivia_answer = trivia_question[2]
 
     await ctx.respond(
@@ -312,16 +277,26 @@ async def trivia(
     )
 
     await ctx.respond(
-        f"Please select your answer down below!",
-        view=TriviaComponents(),
+        f"Please select your answer down below (In under 10 seconds!)",
+        view=TriviaButtons(),
     )
 
 
-# Context menus.
-@bot.user_command(name="Ping", description="Ping the user.")
-async def ping(ctx, member: discord.Member):
-    ctx.respond(f"Pong {member.mention}!")
+"""Context menus"""
 
 
+@bot.user_command(name="Creation date")
+async def creation_date(ctx, member: discord.Member):
+    await ctx.respond(
+        f"The account {member.name} was created at `{member.created_at}`."
+    )
+
+
+@bot.user_command(name="Join date")
+async def join_date(ctx, member: discord.Member):
+    await ctx.respond(f"The account {member.name} joined at `{member.joined_at}`.")
+
+
+# Keeping the bot alive and running the bot.
 # keep_alive.keep_alive()
 bot.run(TOKEN)
