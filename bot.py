@@ -26,7 +26,7 @@ List of available commands prompted using slash command:
 `github` - Send the GitHub page for this bot
 `hello` - Say "Hello!"
 `about` - Send information about the bot, such as its purpose and features
-`inspire` - Send a random inspirational quote to uplift the user
+`quote` - Send a random inspirational quote to uplift the user
 `roll` - Send a random dice roll result, from 1 to 6
 `rps` - Play rock, paper, scissors with the user
 `say` - Tell the bot to say something (the same message you're inputting with the commmand)
@@ -37,7 +37,7 @@ List of available commands prompted using slash command:
 `trivia` - Send a random  trivia question and asking the user whether it's true or false
 `convertticks` - Convert ticks to seconds
 `convertseconds` - Convert seconds to ticks
-`latency` - Check the bot's latency
+`ping` - Check the bot's latency
 
 Several commands are grouped into several command subgroups as of 24/05/2023 (update 0.3.5).
 """
