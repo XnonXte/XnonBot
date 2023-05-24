@@ -112,6 +112,18 @@ class TriviaButtons(discord.ui.View):
 @bot.event
 async def on_ready():
     print(f"We have logged in as {bot.user}!")
+    print(
+        """
+                                                           
+,--.   ,--.                       ,-----.           ,--.   
+ \  `.'  / ,--,--,  ,---. ,--,--, |  |) /_  ,---. ,-'  '-. 
+  .'    \  |      \| .-. ||      \|  .-.  \| .-. |'-.  .-' 
+ /  .'.  \ |  ||  |' '-' '|  ||  ||  '--' /' '-' '  |  |   
+'--'   '--'`--''--' `---' `--''--'`------'  `---'   `--'   
+                                                           
+
+Refer to my GitHub page for contact information, have fun using the bot!"""
+    )
 
 
 @bot.command(description="Say hello to the user.")
