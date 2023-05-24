@@ -7,12 +7,11 @@ import os
 from XnonBotModules import bot_req, keep_alive
 import html
 
+prefix = "$"
 load_dotenv("C:\Programming\XnonBot\dev.env")
-TOKEN = os.getenv("XNONBOTTOKEN")
-
 intents = discord.Intents.default()
 intents.message_content = True
-bot = discord.Bot(command_prefix=";", intents=intents)
+bot = discord.Bot(command_prefix=prefix, intents=intents)
 
 # Creating an instance of several subcommand groups that we'll use later.
 game = bot.create_group("game")
@@ -20,8 +19,9 @@ generate = bot.create_group("generate")
 utility = bot.create_group("utility")
 
 COMMANDS = """
-List of available commands:
+List of available commands prompted using slash command:
 
+`quickstart` - Send a quickstart message
 `help` - Send a list of available slash commands
 `github` - Send the GitHub page for this bot
 `hello` - Say "Hello!"
@@ -106,9 +106,6 @@ class TriviaButtons(discord.ui.View):
             )
 
 
-"""General subcommand group"""
-
-
 @bot.event
 async def on_ready():
     print(f"We have logged in as {bot.user}!")
@@ -123,6 +120,41 @@ async def on_ready():
                                                            
 
 Refer to my GitHub page for contact information, have fun using the bot!"""
+    )
+
+
+async def on_command_error(ctx, error):
+    if isinstance(error, discord.ApplicationCommandError):
+        await ctx.send(
+            "We've encountered an App command error! Please check the terminal for more information.",
+            ephemeral=True,
+        )
+
+
+"""Prefixes command"""
+
+
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+
+    if message.content.startswith(f"{prefix}quickstart"):
+        await message.channel.send(
+            f"Thank you for using XnonBot! You can start by prompting `/help` or `{prefix}help` to get started."
+        )
+
+    if message.content.startswith(f"{prefix}help"):
+        await message.channel.send(COMMANDS)
+
+
+"""General subcommand group"""
+
+
+@bot.command(name="quickstart", description="Send a quickstart message.")
+async def quickstart(ctx):
+    await ctx.respond(
+        f"Thank you for using XnonBot! You can start by prompting /help or {prefix}help to get started."
     )
 
 
@@ -278,7 +310,7 @@ async def trivia(
     ctx,
     category: discord.Option(
         str,
-        description="Choose the category (e.g. animal, refer to the GitHub page for more categories)",
+        description="Choose the category (e.g. animal, refer to the GitHub page for more categories).",
     ),
 ):
     global correct_trivia_answer
@@ -315,4 +347,4 @@ async def join_date(ctx, member: discord.Member):
 
 # Keeping the bot alive and running the bot.
 # keep_alive.keep_alive()
-bot.run(TOKEN)
+bot.run(os.getenv("XNONBOTTOKEN"))
