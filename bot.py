@@ -47,6 +47,10 @@ Several commands are grouped into several command subgroups as of 24/05/2023 (up
 
 
 class TriviaButtons(discord.ui.View):
+    def __init__(self, author, **kwargs):
+        super().__init__(**kwargs)
+        self.author = author
+
     @discord.ui.button(
         label="True",
         style=discord.ButtonStyle.primary,
@@ -54,7 +58,7 @@ class TriviaButtons(discord.ui.View):
     )
     async def trivia_button_true_callback(self, button, interaction):
         if (
-            interaction.user != interaction.message.author
+            interaction.user.id != self.author.id
         ):  # Check if the user pressing the button is the same one as the author.
             await interaction.response.send_message(
                 "I wasn't asking you! To run another question, please send /trivia.",
@@ -81,7 +85,7 @@ class TriviaButtons(discord.ui.View):
         emoji="🚫",
     )
     async def trivia_button_false_callback(self, button, interaction):
-        if interaction.user != interaction.message.author:
+        if interaction.user.id != self.author.id:
             await interaction.response.send_message(
                 "I wasn't asking you! To run another question, please send /trivia.",
                 ephemeral=True,
@@ -277,8 +281,8 @@ async def trivia(
     )
 
     await ctx.respond(
-        f"Please select your answer down below (In under 10 seconds!)",
-        view=TriviaButtons(),
+        f"Please select your answer down below!",
+        view=TriviaButtons(ctx.author),
     )
 
 
