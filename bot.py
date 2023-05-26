@@ -7,7 +7,7 @@ from BotModules import xnonbot_buttons, xnonbot_requests, keep_alive
 import html
 
 version = "Beta 0.4"
-prefix = "$"
+prefix = ";"
 load_dotenv("C:\Programming\XnonBot\.env")
 
 intents = discord.Intents.default()
@@ -39,6 +39,29 @@ PREFIXEDCOMMANDS = """
 `quickstart` - Sends a quickstart message
 """
 
+help_message_embed = discord.Embed(
+    description="Thank you for using XnonBot!",
+    color=discord.Colour.from_rgb(0, 217, 255),
+)
+help_message_embed.add_field(name="**Slash Commands**", value=SLASHCOMMANDS)
+help_message_embed.add_field(
+    name=f"**Prefixed Comands** (prompted using {prefix})",
+    value=PREFIXEDCOMMANDS,
+    inline=False,
+)
+
+help_message_embed.set_author(
+    name="Help and about",
+    icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
+)
+help_message_embed.set_footer(
+    text=f"XnonBot Version {version} | Created with ❤ by XnonXte.",
+    icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
+)
+help_message_embed.set_thumbnail(
+    url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png"
+)
+
 
 @bot.event
 async def on_ready():
@@ -62,7 +85,7 @@ async def on_message(message):
             f"Thank you for using XnonBot! You can start by prompting `/help` or `{prefix}help` to get started."
         )
     elif message.content.startswith(f"{prefix}help"):
-        await message.channel.send(f"{prefix}help prompted!", embed=help_message_embed)
+        await message.channel.send(embed=help_message_embed)
 
 
 """General command group"""
@@ -82,30 +105,7 @@ async def hello(ctx):
 
 @xb.command(description="Send a list of available slash commands.")
 async def help(ctx):
-    global help_message_embed
-
-    help_message_embed = discord.Embed(
-        description="Thank you for using XnonBot!",
-        color=discord.Colour.from_rgb(0, 217, 255),
-    )
-    help_message_embed.add_field(name="**Slash Commands**", value=SLASHCOMMANDS)
-    help_message_embed.add_field(
-        name="**Prefixed Comands**", value=PREFIXEDCOMMANDS, inline=False
-    )
-
-    help_message_embed.set_author(
-        name="Help and about",
-        icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
-    )
-    help_message_embed.set_footer(
-        text=f"XnonBot Version {version} | Created with ❤ by XnonXte.",
-        icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
-    )
-    help_message_embed.set_thumbnail(
-        url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png"
-    )
-
-    await ctx.respond("/help prompted!", embed=help_message_embed)
+    await ctx.respond(embed=help_message_embed)
 
 
 @xb.command(description="Tell the bot to say something.")
@@ -268,11 +268,11 @@ async def rps(
         title="Prompted using /rps", color=discord.Color.from_rgb(0, 217, 255)
     )
     rps_embed.add_field(
-        title="Rock, paper, scissors",
+        name="Rock, paper, scissors",
         value=f"***User choice:*** `{choice}`\n ***Bot choice:*** `{bot_choice}`\n\n **{output}**",
     )
-    rps_embed.set_author(
-        name=f"XnonBot Version {version} | Created with ❤ by XnonXte.",
+    rps_embed.set_footer(
+        text=f"XnonBot Version {version} | Created with ❤ by XnonXte.",
         icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
     )
 
@@ -336,4 +336,4 @@ async def join_date(ctx, member: discord.Member):
 
 
 # keep_alive.keep_alive()
-bot.run(os.getenv("TESTINGBOTTOKEN"))
+bot.run(os.getenv("XNONBOTTOKEN"))
