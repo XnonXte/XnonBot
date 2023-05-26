@@ -4,7 +4,7 @@ import os
 from pexels_api import API
 from dotenv import load_dotenv
 
-load_dotenv("C:\Programming\XnonBot\dev.env")
+load_dotenv("C:\Programming\XnonBot\.env")
 
 waifu_tuple = (
     "waifu",
@@ -63,15 +63,13 @@ def get_quote():
 def get_dog_pic():
     dog_response = requests.get("https://dog.ceo/api/breeds/image/random")
     dog_convert_json = json.loads(dog_response.text)
-    dog_pic = "Here's a random picture of dog for you! " + dog_convert_json["message"]
-    return dog_pic
+    return dog_convert_json["message"]
 
 
 def get_cat_pic():
     cat_response = requests.get("https://api.thecatapi.com/v1/images/search")
     cat_convert_json = json.loads(cat_response.text)
-    cat_pic = "Here's a random picture of cat for you! " + cat_convert_json[0]["url"]
-    return cat_pic
+    return cat_convert_json[0]["url"]
 
 
 def get_waifu_pic(category):
@@ -80,10 +78,7 @@ def get_waifu_pic(category):
 
     waifu_response = requests.get(f"https://api.waifu.pics/sfw/{category}")
     waifu_convert_json = json.loads(waifu_response.text)
-    waifu_pic = (
-        f" Here's a random {category} picture for you! " + waifu_convert_json["url"]
-    )
-    return waifu_pic
+    return waifu_convert_json["url"]
 
 
 def get_trivia(category):
@@ -115,4 +110,4 @@ def get_pexels_photos(query):
     pexels_client_api.search(query, page=1, results_per_page=1)
     images = pexels_client_api.get_entries()
     for i in images:
-        return i.photographer, i.url, i.original
+        return i.original

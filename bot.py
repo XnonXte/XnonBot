@@ -1,137 +1,55 @@
-# XnonBot Version 0.3.5
-# Migrated from interactions.py to py-cord (hopefully it's a lot more stable!)
+# XnonBot Version 0.4
 import discord
 import random
 from dotenv import load_dotenv
 import os
-from XnonBotModules import bot_req, keep_alive
+from BotModules import xnonbot_buttons, xnonbot_requests, keep_alive
 import html
 
+version = "Beta 0.4"
 prefix = "$"
-load_dotenv("C:\Programming\XnonBot\dev.env")
+load_dotenv("C:\Programming\XnonBot\.env")
+
 intents = discord.Intents.default()
 intents.message_content = True
 bot = discord.Bot(command_prefix=prefix, intents=intents)
 
-# Creating an instance of several subcommand groups that we'll use later.
-game = bot.create_group("game")
-generate = bot.create_group("generate")
-utility = bot.create_group("utility")
+xb = bot.create_group("xnonbot", "general commands (available for everyone!)")
+mod = bot.create_group("moderator", "moderator only commands")
 
-COMMANDS = """
-List of available commands prompted using slash command:
+SLASHCOMMANDS = """`quickstart` - Sends a quickstart message
+`help` - Prompt an help message
+`github` - Github page for this bot
+`about` - Sends information regarding this bot
+`quote` - Sends a random inspirational quote
+`roll` - Sends a random dice roll result, from 1 to 6
+`rps` - Plays rock, paper, scissors with the user
+`say` - Tell the bot to say something
+`cat` - Sends a random cat picture
+`dog` - Sends a random dog picture
+`waifu` - Sends a random waifu picture (it's SFW!)
+`pexels` - Search for an image on pexels.com
+`trivia` - Sends a random  trivia question and asking the user whether it's true or false
+`convertticks` - Converts ticks to seconds
+`convertseconds` - Converts seconds to ticks
+`ping` - Checks the bot's latency"""
 
-`quickstart` - Send a quickstart message
-`help` - Send a list of available slash commands
-`github` - Send the GitHub page for this bot
-`hello` - Say "Hello!"
-`about` - Send information about the bot, such as its purpose and features
-`quote` - Send a random inspirational quote to uplift the user
-`roll` - Send a random dice roll result, from 1 to 6
-`rps` - Play rock, paper, scissors with the user
-`say` - Tell the bot to say something (the same message you're inputting with the commmand)
-`cat` - Send a random cat picture
-`dog` - Send a random dog picture
-`waifu` - Send a random waifu picture (it's SFW!)
-`pexels` - Search an image on pexels.com
-`trivia` - Send a random  trivia question and asking the user whether it's true or false
-`convertticks` - Convert ticks to seconds
-`convertseconds` - Convert seconds to ticks
-`ping` - Check the bot's latency
-
-Several commands are grouped into several command subgroups as of 24/05/2023 (update 0.3.5).
+PREFIXEDCOMMANDS = """
+`help` - Prompt an help message
+`quickstart` - Sends a quickstart message
 """
-
-
-"""Class for /trivia minigame"""
-
-
-class TriviaButtons(discord.ui.View):
-    def __init__(self, author, **kwargs):
-        super().__init__(**kwargs)
-        self.author = author
-
-    @discord.ui.button(
-        label="True",
-        style=discord.ButtonStyle.primary,
-        emoji="✅",
-    )
-    async def trivia_button_true_callback(self, button, interaction):
-        if (
-            interaction.user.id != self.author.id
-        ):  # Check if the user pressing the button is the same one as the author.
-            await interaction.response.send_message(
-                "I wasn't asking you! To run another question, please send /trivia.",
-                ephemeral=True,
-            )
-            return
-        for child in self.children:
-            child.disabled = True
-            child.label = "Button disabled, no more pressing!"
-        await interaction.response.edit_message(view=self)
-
-        if correct_trivia_answer.lower() == "true":
-            await interaction.followup.send(
-                f"{interaction.user.mention} chooses True, {interaction.user.mention} is correct!"  # We're using followup.send() because we can't have interaction.response twice inside of the same function.
-            )
-        else:
-            await interaction.followup.send(
-                f"Sorry {interaction.user.mention}, but the answer is {correct_trivia_answer}."
-            )
-
-    @discord.ui.button(
-        label="False",
-        style=discord.ButtonStyle.danger,
-        emoji="🚫",
-    )
-    async def trivia_button_false_callback(self, button, interaction):
-        if interaction.user.id != self.author.id:
-            await interaction.response.send_message(
-                "I wasn't asking you! To run another question, please send /trivia.",
-                ephemeral=True,
-            )
-            return
-        for child in self.children:
-            child.disabled = True
-            child.label = "Button disabled, no more pressing!"
-        await interaction.response.edit_message(view=self)
-
-        if correct_trivia_answer.lower() == "false":
-            await interaction.followup.send(
-                f"{interaction.user.mention} chooses False, {interaction.user.mention} is correct!"
-            )
-        else:
-            await interaction.followup.send(
-                f"Sorry {interaction.user.mention}, but the answer is {correct_trivia_answer}."
-            )
 
 
 @bot.event
 async def on_ready():
     print(f"We have logged in as {bot.user}!")
-    print(
-        """
-                                                           
-,--.   ,--.                       ,-----.           ,--.   
- \  `.'  / ,--,--,  ,---. ,--,--, |  |) /_  ,---. ,-'  '-. 
-  .'    \  |      \| .-. ||      \|  .-.  \| .-. |'-.  .-' 
- /  .'.  \ |  ||  |' '-' '|  ||  ||  '--' /' '-' '  |  |   
-'--'   '--'`--''--' `---' `--''--'`------'  `---'   `--'   
-                                                           
-
-Refer to my GitHub page for contact information, have fun using the bot!"""
-    )
 
 
-async def on_command_error(ctx, error):
-    if isinstance(error, discord.ApplicationCommandError):
-        await ctx.send(
-            "We've encountered an App command error! Please check the terminal for more information.",
-            ephemeral=True,
-        )
+async def on_member_join(ctx, member):
+    await ctx.respond(f"Please welcome {member.mention} to the server!")
 
 
-"""Prefixes command"""
+"""Prefixed commands"""
 
 
 @bot.event
@@ -143,113 +61,169 @@ async def on_message(message):
         await message.channel.send(
             f"Thank you for using XnonBot! You can start by prompting `/help` or `{prefix}help` to get started."
         )
-
-    if message.content.startswith(f"{prefix}help"):
-        await message.channel.send(COMMANDS)
-
-
-"""General subcommand group"""
+    elif message.content.startswith(f"{prefix}help"):
+        await message.channel.send(f"{prefix}help prompted!", embed=help_message_embed)
 
 
-@bot.command(name="quickstart", description="Send a quickstart message.")
+"""General command group"""
+
+
+@xb.command(name="quickstart", description="Send a quickstart message.")
 async def quickstart(ctx):
     await ctx.respond(
         f"Thank you for using XnonBot! You can start by prompting /help or {prefix}help to get started."
     )
 
 
-@bot.command(description="Say hello to the user.")
+@xb.command(description="Say hello to the user.")
 async def hello(ctx):
     await ctx.respond(f"Hello {ctx.user.mention}!")
 
 
-@bot.command(description="Send a list of available slash commands.")
+@xb.command(description="Send a list of available slash commands.")
 async def help(ctx):
-    await ctx.respond(COMMANDS)
+    global help_message_embed
+
+    help_message_embed = discord.Embed(
+        description="Thank you for using XnonBot!",
+        color=discord.Colour.from_rgb(0, 217, 255),
+    )
+    help_message_embed.add_field(name="**Slash Commands**", value=SLASHCOMMANDS)
+    help_message_embed.add_field(
+        name="**Prefixed Comands**", value=PREFIXEDCOMMANDS, inline=False
+    )
+
+    help_message_embed.set_author(
+        name="Help and about",
+        icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
+    )
+    help_message_embed.set_footer(
+        text=f"XnonBot Version {version} | Created with ❤ by XnonXte.",
+        icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
+    )
+    help_message_embed.set_thumbnail(
+        url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png"
+    )
+
+    await ctx.respond("/help prompted!", embed=help_message_embed)
 
 
-@bot.slash_command(description="Tell the bot to say something.")
+@xb.command(description="Tell the bot to say something.")
 async def say(ctx, message: discord.Option(str, description="Message to send.")):
     await ctx.respond(f"{ctx.user.mention} said: `{message}`")
 
 
-@bot.command(description="Send the information about this bot.")
+@xb.command(description="Send the information about this bot.")
 async def about(ctx):
     await ctx.respond(
         "I'm a chat-bot developed by XnonXte! My code is available on GitHub (/github)."
     )
 
 
-@bot.command(description="Choose a random dice roll (1 to 6).")
+@xb.command(description="Choose a random dice roll (1 to 6).")
 async def roll(ctx):
     await ctx.respond(random.randint(1, 6))
 
 
-@bot.command(description="Official GitHub page for this bot.")
+@xb.command(description="Official GitHub page for this bot.")
 async def github(ctx):
     await ctx.respond("https://github.com/XnonXte/XnonBot")
 
 
-"""Generate subcommand group"""
-
-
-@generate.command(description="Get a random quote from zenquotes.io")
+@xb.command(description="Get a random quote from zenquotes.io")
 async def quote(ctx):
-    quote = bot_req.get_quote()
+    quote = xnonbot_requests.get_quote()
     await ctx.respond(quote)
 
 
-@generate.command(
+@xb.command(
     description="Get a random waifu picture from https://waifu.pics/docs (It's SFW!)"
 )
 async def waifu(
     ctx,
     category: discord.Option(
         str,
-        description="Select the category (e.g. waifu, please refer to https://waifu.pics/docs for more categories!)",
+        description="Select the category (Example 'waifu', please refer to https://waifu.pics/docs for more categories!)",
     ),
 ):
-    waifu_pic = bot_req.get_waifu_pic(category)
+    waifu_pic = xnonbot_requests.get_waifu_pic(category)
     if waifu_pic is None:
         await ctx.respond("Invalid value, please try again!", ephemeral=True)
         return
-    await ctx.respond(waifu_pic)
+
+    waifu_embed = discord.Embed(
+        title="Waifu generated!",
+        description=f"Here's a(n) {category} image for you.",
+    )
+    waifu_embed.set_image(url=waifu_pic)
+    waifu_embed.set_footer(
+        text=f"XnonBot Version {version} | Created with ❤ by XnonXte.",
+        icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
+    )
+
+    await ctx.respond(embed=waifu_embed)
 
 
-@generate.command(description="Get a random dog picture from https://dog.ceo/dog-api")
+@xb.command(description="Get a random dog picture from https://dog.ceo/dog-api")
 async def dog(ctx):
-    dog = bot_req.get_dog_pic()
-    await ctx.respond(dog)
+    dog = xnonbot_requests.get_dog_pic()
+    dog_embed = discord.Embed(
+        title="Bark!",
+        description="Random dog picture generated.",
+    )
+    dog_embed.set_image(url=dog)
+    dog_embed.set_footer(
+        text=f"XnonBot Version {version} | Created with ❤ by XnonXte.",
+        icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
+    )
+
+    await ctx.respond(embed=dog_embed)
 
 
-@generate.command(description="Get a random cat picture from https://thecatapi.com")
+@xb.command(description="Get a random cat picture from https://thecatapi.com")
 async def cat(ctx):
-    cat = bot_req.get_cat_pic()
-    await ctx.respond(cat)
+    cat = xnonbot_requests.get_cat_pic()
+    cat_embed = discord.Embed(
+        title="Meow!",
+        description="Random cat picture generated.",
+    )
+    cat_embed.set_image(url=cat)
+    cat_embed.set_footer(
+        text=f"XnonBot Version {version} | Created with ❤ by XnonXte.",
+        icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
+    )
+
+    await ctx.respond(embed=cat_embed)
 
 
-@generate.command(description="Search an image on pexels.com")
+@xb.command(description="Search an image on pexels.com")
 async def pexels(
     ctx, search_query: discord.Option(str, description="Image to search.")
 ):
     try:
-        image_output = bot_req.get_pexels_photos(search_query)
-        await ctx.respond(
-            f"Here's a(n) {search_query} image for you! {image_output[2]}"
+        image_output = xnonbot_requests.get_pexels_photos(search_query)
+
+        pexels_output_embed = discord.Embed(
+            title="Image from pexels generated!",
+            description=f"Here's a(n) {search_query} image for you.",
         )
+        pexels_output_embed.set_image(url=image_output)
+        pexels_output_embed.set_footer(
+            text=f"XnonBot Version {version} | Created with ❤ by XnonXte.",
+            icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
+        )
+
+        await ctx.respond(embed=pexels_output_embed)
     except Exception as e:
         await ctx.respond(f"An error has been encountered: {e}", ephemeral=True)
 
 
-"""Utility subcommand group"""
-
-
-@utility.command(description="Check the bot's latency.")
+@xb.command(description="Check the bot's latency.")
 async def ping(ctx):
     await ctx.respond(f"Pong! My ping is {round(bot.latency * 100, 2)}ms.")
 
 
-@utility.command(description="Convert ticks to seconds.")
+@xb.command(description="Convert ticks to seconds.")
 async def convertticks(
     ctx, value: discord.Option(str, description="Enter the value in ticks.")
 ):
@@ -257,7 +231,7 @@ async def convertticks(
     await ctx.respond(f"{value} ticks is equal to {convert} seconds.")
 
 
-@utility.command(description="Convert seconds to ticks.")
+@xb.command(description="Convert seconds to ticks.")
 async def convertseconds(
     ctx, value: discord.Option(float, description="Enter the value in seconds.")
 ):
@@ -265,56 +239,55 @@ async def convertseconds(
     await ctx.respond(f"{value} seconds is equal to {int(convert)} ticks.")
 
 
-"""Game subcommand group"""
-
-
-@game.command(description="Play rock, paper, scissors with the user.")
+@xb.command(description="Play rock, paper, scissors with the user.")
 async def rps(
     ctx,
     choice: discord.Option(str, description="Choose either rock, paper, or scissors."),
 ):
-    choices = ("rock", "paper", "scissors")
-    bot_choice = random.choice(choices)
+    rps_choices = ("rock", "paper", "scissors")
+    bot_choice = random.choice(rps_choices)
 
-    if choice not in choices:
+    if choice.lower() not in rps_choices:
         await ctx.respond(
             "Invalid choice. Please choose either rock, paper, or scissors!",
             ephemeral=True,
         )
         return
-
-    if choice == bot_choice:
-        await ctx.respond(
-            f"{ctx.user.mention} chooses {choice}. I choose {bot_choice}. We tied!"
-        )
-    elif choice == "rock" and bot_choice == "scissors":
-        await ctx.respond(
-            f"{ctx.user.mention} chooses {choice}. I choose {bot_choice}. {ctx.user.mention} won!"
-        )
-    elif choice == "scissors" and bot_choice == "paper":
-        await ctx.respond(
-            f"{ctx.user.mention} chooses {choice}. I choose {bot_choice}. {ctx.user.mention} won!"
-        )
-    elif choice == "paper" and bot_choice == "rock":
-        await ctx.respond(
-            f"{ctx.user.mention} chooses {choice}. I choose {bot_choice}. {ctx.user.mention} won!"
-        )
+    elif choice.lower() == bot_choice:
+        output = "We tied!"
+    elif choice.lower() == "rock" and bot_choice == "scissors":
+        output = "You won!"
+    elif choice.lower() == "paper" and bot_choice == "rock":
+        output = "You won!"
+    elif choice.lower() == "scissors" and bot_choice == "paper":
+        output = "You won!"
     else:
-        await ctx.respond(
-            f"{ctx.user.mention} chooses {choice}. I choose {bot_choice}. I won!"
-        )
+        output = "You lost!"
+
+    rps_embed = discord.Embed(
+        title="Prompted using /rps", color=discord.Color.from_rgb(0, 217, 255)
+    )
+    rps_embed.add_field(
+        title="Rock, paper, scissors",
+        value=f"***User choice:*** `{choice}`\n ***Bot choice:*** `{bot_choice}`\n\n **{output}**",
+    )
+    rps_embed.set_author(
+        name=f"XnonBot Version {version} | Created with ❤ by XnonXte.",
+        icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
+    )
+
+    await ctx.respond(embed=rps_embed)
 
 
-@game.command(description="Play a trivia game from https://opentdb.com/")
+@xb.command(description="Play a trivia game from https://opentdb.com")
 async def trivia(
     ctx,
     category: discord.Option(
         str,
-        description="Choose the category (e.g. animal, refer to the GitHub page for more categories).",
+        description="Choose the category (Example 'animal', refer to the GitHub page for more categories).",
     ),
 ):
-    global correct_trivia_answer
-    trivia_question = bot_req.get_trivia(category.lower())
+    trivia_question = xnonbot_requests.get_trivia(category.lower())
     if trivia_question is None:
         await ctx.respond("Invalid value, please try again!", ephemeral=True)
         return
@@ -325,12 +298,26 @@ async def trivia(
     )
 
     await ctx.respond(
-        f"Please select your answer down below!",
-        view=TriviaButtons(ctx.author),
+        f"Please select your answer!",
+        view=xnonbot_buttons.TriviaButtons(ctx.author, correct_trivia_answer),
     )
 
 
-"""Context menus"""
+@xb.command(description="Guess the number game.")
+async def gtn(ctx, max: discord.Option(int, description="Maximum number to guess.")):
+    random_number = random.randint(0, max)
+
+    await ctx.respond(f"Guess the number (maximum: {max})")
+    response = await bot.wait_for(
+        "message", check=lambda message: message.author == ctx.author
+    )
+
+    if int(response.content) == random_number:
+        await ctx.send(f"You've guessed it right! The number is {random_number}.")
+    elif int(response.content) > max:
+        await ctx.send(f"That's too high! The max number is {max}.")
+    else:
+        return
 
 
 @bot.user_command(name="Creation date")
@@ -345,6 +332,8 @@ async def join_date(ctx, member: discord.Member):
     await ctx.respond(f"The account {member.name} joined at `{member.joined_at}`.")
 
 
-# Keeping the bot alive and running the bot.
+"""Moderator command group"""  # Coming soon
+
+
 # keep_alive.keep_alive()
-bot.run(os.getenv("XNONBOTTOKEN"))
+bot.run(os.getenv("TESTINGBOTTOKEN"))
