@@ -11,7 +11,7 @@ A discord bot developed by XnonXte, written in Python. The official invite link 
 
 ## Changelogs
 
-- Update 27/05/2023 - eleasing XnonBot Beta Version 0.4, added embeds for `/help`, `/dog`, `/cat`, `/pexels`, and `/rps`. QoL updates and subgroups reworked
+- Update 27/05/2023 - Releasing XnonBot Beta Version 0.4, added embeds for `/help`, `/dog`, `/cat`, `/pexels`, and `/rps`. QoL updates with subgroups reworked
 - Update 24/05/2023 - Releasing XnonBot Beta Version 0.3.5, migrated to py-cord, fixed the issue with embedding messages, added `/latency`, added several subgroups for commands
 - Update 21/05/2023 - Releasing XnonBot Beta Version 0.3, fixed the issue with pressing buttons, added `/converticks` and `/convertseconds`, added a lot more comments
 - Update 19/05/2023 - Releasing XnonBot Beta Version 0.2.3, added a category query for get_waifu_pic, and a couple of context menus
