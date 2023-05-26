@@ -18,7 +18,7 @@ xb = bot.create_group("xnonbot", "general commands (available for everyone!)")
 mod = bot.create_group("moderator", "moderator only commands")
 
 SLASHCOMMANDS = """`quickstart` - Sends a quickstart message
-`help` - Prompt an help message
+`help` - Promts help message
 `github` - Github page for this bot
 `about` - Sends information regarding this bot
 `quote` - Sends a random inspirational quote
@@ -35,7 +35,7 @@ SLASHCOMMANDS = """`quickstart` - Sends a quickstart message
 `ping` - Checks the bot's latency"""
 
 PREFIXEDCOMMANDS = """
-`help` - Prompt an help message
+`help` - Promts help message
 `quickstart` - Sends a quickstart message
 """
 
@@ -45,7 +45,7 @@ help_message_embed = discord.Embed(
 )
 help_message_embed.add_field(name="**Slash Commands**", value=SLASHCOMMANDS)
 help_message_embed.add_field(
-    name=f"**Prefixed Comands** (prompted using {prefix})",
+    name=f"**Prefixed Comands** (prompted using '{prefix}')",
     value=PREFIXEDCOMMANDS,
     inline=False,
 )
