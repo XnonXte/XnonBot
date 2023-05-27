@@ -1,10 +1,7 @@
 # XnonBot Version 0.4
-import discord
-import random
+import discord, random, os, html
 from dotenv import load_dotenv
-import os
 from BotModules import xnonbot_buttons, xnonbot_requests, keep_alive
-import html
 
 version = "Beta 0.4"
 prefix = ";"
@@ -14,10 +11,13 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = discord.Bot(command_prefix=prefix, intents=intents)
 
-xb = bot.create_group("xnonbot", "general commands (available for everyone!)")
-mod = bot.create_group("moderator", "moderator only commands")
+# Command groups and subgroups
+xb = discord.SlashCommandGroup("xnonbot", "general commands")
+mod = discord.SlashCommandGroup("moderator", "moderator only commands")
+wiki = xb.create_subgroup("wikipedia", "wikipedia related commands")
 
-SLASHCOMMANDS = """`quickstart` - Sends a quickstart message
+SLASHCOMMANDS = """
+`quickstart` - Sends a quickstart message
 `help` - Prompts help message
 `github` - Github page for this bot
 `about` - Sends information regarding this bot
@@ -32,44 +32,42 @@ SLASHCOMMANDS = """`quickstart` - Sends a quickstart message
 `trivia` - Sends a random  trivia question and asking the user whether it's true or false
 `convertticks` - Converts ticks to seconds
 `convertseconds` - Converts seconds to ticks
-`ping` - Checks the bot's latency"""
+`ping` - Checks the bot's latency
+`gtn` - Plays a guess-the-number game.
+"""
 
 PREFIXEDCOMMANDS = """
-`help` - Prompts help message
 `quickstart` - Sends a quickstart message
 """
 
-help_message_embed = discord.Embed(
-    description="Thank you for using XnonBot!",
-    color=discord.Colour.from_rgb(0, 217, 255),
-)
-help_message_embed.add_field(name="**Slash Commands**", value=SLASHCOMMANDS)
-help_message_embed.add_field(
-    name=f'**Prefixed Comands** (the prefix is "{prefix}")',
-    value=PREFIXEDCOMMANDS,
-    inline=False,
-)
-
-help_message_embed.set_author(
-    name="Help and about",
-    icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
-)
-help_message_embed.set_footer(
-    text=f"XnonBot Version {version} | Created with ❤ by XnonXte.",
-    icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
-)
-help_message_embed.set_thumbnail(
-    url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png"
-)
+# snipped_message = None
+# edited_message = None
 
 
+# Startup
 @bot.event
 async def on_ready():
     print(f"We have logged in as {bot.user}!")
 
 
+# Events that read message content(s)
+@bot.event
 async def on_member_join(ctx, member):
     await ctx.respond(f"Please welcome {member.mention} to the server!")
+
+
+# todo Make these lines of code working somehow.
+# async def on_message_delete(message):
+#     global snipped_author, snipped_message
+#     snipped_message = f"Message: {message.content}"
+#     snipped_author = f"Author: {message.author.id}"
+
+
+# async def on_message_edit(before, after):
+#     global old_message, edited_message, message_author
+#     old_message = before.content
+#     edited_message = after.content
+#     message_author = after.author.id
 
 
 """Prefixed commands"""
@@ -79,48 +77,68 @@ async def on_member_join(ctx, member):
 async def on_message(message):
     if message.author == bot.user:
         return
-
-    if message.content.startswith(f"{prefix}quickstart"):
+    elif message.content.startswith(f"{prefix}quickstart"):
         await message.channel.send(
-            f"Thank you for using XnonBot! You can start by prompting `/help` or `{prefix}help` to get started."
+            f"Thank you for using XnonBot! You can start by prompting `/help` to get started."
         )
-    elif message.content.startswith(f"{prefix}help"):
-        await message.channel.send(embed=help_message_embed)
 
 
 """General command group"""
 
 
-@xb.command(name="quickstart", description="Send a quickstart message.")
+@xb.command(name="quickstart", description="Sends a quickstart message.")
 async def quickstart(ctx):
     await ctx.respond(
-        f"Thank you for using XnonBot! You can start by prompting /help or {prefix}help to get started."
+        f"Thank you for using XnonBot! You can start by prompting `/help` to get started."
     )
 
 
-@xb.command(description="Say hello to the user.")
+@xb.command(description="Says hello to the user.")
 async def hello(ctx):
     await ctx.respond(f"Hello {ctx.user.mention}!")
 
 
-@xb.command(description="Send a list of available slash commands.")
+@xb.command(description="Overview of available slash commands.")
 async def help(ctx):
+    help_message_embed = discord.Embed(
+        description="Thank you for using XnonBot!",
+        color=discord.Colour.from_rgb(0, 217, 255),
+    )
+    help_message_embed.add_field(name="**Slash Commands**", value=SLASHCOMMANDS)
+    help_message_embed.add_field(
+        name=f'**Prefixed Comands** (the prefix is "{prefix}")',
+        value=PREFIXEDCOMMANDS,
+        inline=False,
+    )
+
+    help_message_embed.set_author(
+        name="Help and about",
+        icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
+    )
+    help_message_embed.set_footer(
+        text=f"XnonBot Version {version} | Created with ❤ by XnonXte.",
+        icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
+    )
+    help_message_embed.set_thumbnail(
+        url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png"
+    )
+
     await ctx.respond(embed=help_message_embed)
 
 
-@xb.command(description="Tell the bot to say something.")
+@xb.command(description="Tells the bot to say something.")
 async def say(ctx, message: discord.Option(str, description="Message to send.")):
     await ctx.respond(f"{ctx.user.mention} said: `{message}`")
 
 
-@xb.command(description="Send the information about this bot.")
+@xb.command(description="Sends the information about this bot.")
 async def about(ctx):
     await ctx.respond(
         "I'm a chat-bot developed by XnonXte! My code is available on GitHub (/github)."
     )
 
 
-@xb.command(description="Choose a random dice roll (1 to 6).")
+@xb.command(description="Chooses a random dice roll (1 to 6).")
 async def roll(ctx):
     await ctx.respond(random.randint(1, 6))
 
@@ -130,14 +148,14 @@ async def github(ctx):
     await ctx.respond("https://github.com/XnonXte/XnonBot")
 
 
-@xb.command(description="Get a random quote from zenquotes.io")
+@xb.command(description="Gets a random quote from zenquotes.io")
 async def quote(ctx):
     quote = xnonbot_requests.get_quote()
     await ctx.respond(quote)
 
 
 @xb.command(
-    description="Get a random waifu picture from https://waifu.pics/docs (It's SFW!)"
+    description="Gets a random waifu picture from https://waifu.pics/docs (It's SFW!)"
 )
 async def waifu(
     ctx,
@@ -164,7 +182,7 @@ async def waifu(
     await ctx.respond(embed=waifu_embed)
 
 
-@xb.command(description="Get a random dog picture from https://dog.ceo/dog-api")
+@xb.command(description="Gets a random dog picture from https://dog.ceo/dog-api")
 async def dog(ctx):
     dog = xnonbot_requests.get_dog_pic()
     dog_embed = discord.Embed(
@@ -180,7 +198,7 @@ async def dog(ctx):
     await ctx.respond(embed=dog_embed)
 
 
-@xb.command(description="Get a random cat picture from https://thecatapi.com")
+@xb.command(description="Gets a random cat picture from https://thecatapi.com")
 async def cat(ctx):
     cat = xnonbot_requests.get_cat_pic()
     cat_embed = discord.Embed(
@@ -196,7 +214,7 @@ async def cat(ctx):
     await ctx.respond(embed=cat_embed)
 
 
-@xb.command(description="Search an image on pexels.com")
+@xb.command(description="Search for an image on pexels.com")
 async def pexels(
     ctx, search_query: discord.Option(str, description="Image to search.")
 ):
@@ -218,12 +236,12 @@ async def pexels(
         await ctx.respond(f"An error has been encountered: {e}", ephemeral=True)
 
 
-@xb.command(description="Check the bot's latency.")
+@xb.command(description="Checks the bot's latency.")
 async def ping(ctx):
     await ctx.respond(f"Pong! My ping is {round(bot.latency * 100, 2)}ms.")
 
 
-@xb.command(description="Convert ticks to seconds.")
+@xb.command(description="Converts ticks to seconds.")
 async def convertticks(
     ctx, value: discord.Option(str, description="Enter the value in ticks.")
 ):
@@ -231,7 +249,7 @@ async def convertticks(
     await ctx.respond(f"{value} ticks is equal to {convert} seconds.")
 
 
-@xb.command(description="Convert seconds to ticks.")
+@xb.command(description="Converts seconds to ticks.")
 async def convertseconds(
     ctx, value: discord.Option(float, description="Enter the value in seconds.")
 ):
@@ -239,7 +257,7 @@ async def convertseconds(
     await ctx.respond(f"{value} seconds is equal to {int(convert)} ticks.")
 
 
-@xb.command(description="Play rock, paper, scissors with the user.")
+@xb.command(description="Plays rock, paper, scissors with the user.")
 async def rps(
     ctx,
     choice: discord.Option(str, description="Choose either rock, paper, or scissors."),
@@ -280,7 +298,7 @@ async def rps(
     await ctx.respond(embed=rps_embed)
 
 
-@xb.command(description="Play a trivia game from https://opentdb.com")
+@xb.command(description="Plays a trivia game from https://opentdb.com")
 async def trivia(
     ctx,
     category: discord.Option(
@@ -321,6 +339,25 @@ async def gtn(ctx, max: discord.Option(int, description="Maximum number to guess
         return
 
 
+# * Future slash commands.
+# @xb.command(description="Gets a deleted message.")
+# async def recentdelete(ctx):
+#     if snipped_message is None:
+#         await ctx.respond("There's no message to snipe!")
+#     else:
+#         await ctx.respond(f"{snipped_message}\n{snipped_author}")
+
+
+# @xb.command(description="Gets an edited message.")
+# async def recentedit(ctx):
+#     if edited_message is None:
+#         await ctx.respond("There's no message edited!")
+#     else:
+#         await ctx.respond(
+#             f"Old message: {old_message}\nEdited message:{edited_message}\nAuthor: {message_author} "
+#         )
+
+
 @bot.user_command(name="Creation date")
 async def creation_date(ctx, member: discord.Member):
     await ctx.respond(
@@ -333,8 +370,13 @@ async def join_date(ctx, member: discord.Member):
     await ctx.respond(f"The account {member.name} joined at `{member.joined_at}`.")
 
 
+"""Wikipedia command subgroup"""  # WIP
+
+
 """Moderator command group"""  # Coming soon
 
 
+bot.add_application_command(xb)
+bot.add_application_command(mod)
 # keep_alive.keep_alive()
 bot.run(os.getenv("XNONBOTTOKEN"))
