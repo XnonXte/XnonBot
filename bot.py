@@ -1,4 +1,4 @@
-# XnonBot Version 0.4
+# XnonBot Version 0.4.1
 import discord, random, os, html
 from dotenv import load_dotenv
 from BotModules import xnonbot_buttons, xnonbot_requests, keep_alive
@@ -34,6 +34,7 @@ SLASHCOMMANDS = """
 `convertseconds` - Converts seconds to ticks
 `ping` - Checks the bot's latency
 `gtn` - Plays a guess-the-number game.
+`dadjoke` - Gets a random dad joke.
 """
 
 PREFIXEDCOMMANDS = """
@@ -356,6 +357,12 @@ async def gtn(ctx, max: discord.Option(int, description="Maximum number to guess
 #         await ctx.respond(
 #             f"Old message: {old_message}\nEdited message:{edited_message}\nAuthor: {message_author} "
 #         )
+
+
+@xb.command(description="Gets a random dad joke.")
+async def dadjoke(ctx):
+    dad = xnonbot_requests.get_dad_joke()
+    await ctx.respond(dad)
 
 
 @bot.user_command(name="Creation date")

@@ -1,6 +1,4 @@
-import requests
-import json
-import os
+import requests, json, os
 from pexels_api import API
 from dotenv import load_dotenv
 
@@ -111,3 +109,9 @@ def get_pexels_photos(query):
     images = pexels_client_api.get_entries()
     for i in images:
         return i.original
+
+
+def get_dad_joke():
+    dad_joke_requests = requests.get("https://icanhazdadjoke.com/slack")
+    dad_joke_convert_json = json.loads(dad_joke_requests.text)
+    return dad_joke_convert_json["attachments"][0]["text"]
