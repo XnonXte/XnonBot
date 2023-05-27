@@ -18,7 +18,7 @@ xb = bot.create_group("xnonbot", "general commands (available for everyone!)")
 mod = bot.create_group("moderator", "moderator only commands")
 
 SLASHCOMMANDS = """`quickstart` - Sends a quickstart message
-`help` - Promts help message
+`help` - Prompts help message
 `github` - Github page for this bot
 `about` - Sends information regarding this bot
 `quote` - Sends a random inspirational quote
@@ -35,7 +35,7 @@ SLASHCOMMANDS = """`quickstart` - Sends a quickstart message
 `ping` - Checks the bot's latency"""
 
 PREFIXEDCOMMANDS = """
-`help` - Promts help message
+`help` - Prompts help message
 `quickstart` - Sends a quickstart message
 """
 
@@ -45,7 +45,7 @@ help_message_embed = discord.Embed(
 )
 help_message_embed.add_field(name="**Slash Commands**", value=SLASHCOMMANDS)
 help_message_embed.add_field(
-    name=f"**Prefixed Comands** (prompted using '{prefix}')",
+    name=f'**Prefixed Comands** (the prefix is "{prefix}")',
     value=PREFIXEDCOMMANDS,
     inline=False,
 )
@@ -246,30 +246,31 @@ async def rps(
 ):
     rps_choices = ("rock", "paper", "scissors")
     bot_choice = random.choice(rps_choices)
+    user_choice = choice.lower()
 
-    if choice.lower() not in rps_choices:
+    if user_choice not in rps_choices:
         await ctx.respond(
             "Invalid choice. Please choose either rock, paper, or scissors!",
             ephemeral=True,
         )
         return
-    elif choice.lower() == bot_choice:
+    elif user_choice == bot_choice:
         output = "We tied!"
-    elif choice.lower() == "rock" and bot_choice == "scissors":
+    elif user_choice == "rock" and bot_choice == "scissors":
         output = "You won!"
-    elif choice.lower() == "paper" and bot_choice == "rock":
+    elif user_choice == "paper" and bot_choice == "rock":
         output = "You won!"
-    elif choice.lower() == "scissors" and bot_choice == "paper":
+    elif user_choice == "scissors" and bot_choice == "paper":
         output = "You won!"
     else:
         output = "You lost!"
 
     rps_embed = discord.Embed(
-        title="Prompted using /rps", color=discord.Color.from_rgb(0, 217, 255)
+        title="Rock, paper, scissors", color=discord.Color.from_rgb(0, 217, 255)
     )
     rps_embed.add_field(
-        name="Rock, paper, scissors",
-        value=f"***User choice:*** `{choice}`\n ***Bot choice:*** `{bot_choice}`\n\n **{output}**",
+        name="Results:",
+        value=f"You choose ***{choice}***\n Computer chooses ***{bot_choice}***\n\n {output}",
     )
     rps_embed.set_footer(
         text=f"XnonBot Version {version} | Created with ❤ by XnonXte.",
