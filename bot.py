@@ -19,7 +19,7 @@ cfg = discord.SlashCommandGroup("config", "moderator only commands")
 
 # Subgroups of the group xb.
 gen = xb.create_subgroup("generate", "generate related command")
-game = xb.create_subgroup("game", "game related commmands")
+game = xb.create_subgroup("game", "games related commmands")
 util = xb.create_subgroup("utility", "utilities related commands")
 wk = xb.create_subgroup("wikipedia", "wikipedia related commands")
 
@@ -145,7 +145,7 @@ async def help(
         url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png"
     )
 
-    if viewable != True:
+    if viewable == True:
         ephemeral_message = False
     else:
         ephemeral_message = True
