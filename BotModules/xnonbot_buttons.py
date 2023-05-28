@@ -4,7 +4,7 @@ import discord
 # Buttons for /trivia game.
 class TriviaButtons(discord.ui.View):
     def __init__(self, author, correct_trivia_answer, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(**kwargs, timeout=None)
         self.author = author
         self.correct_answer = correct_trivia_answer
 
@@ -29,7 +29,8 @@ class TriviaButtons(discord.ui.View):
 
         if self.correct_answer.lower() == "true":
             await interaction.followup.send(
-                f"{interaction.user.mention} chooses True, {interaction.user.mention} is correct!"  # We're using followup.send() because we can't have interaction.response twice inside of the same function.
+                # We're using followup.send() because we can't have interaction.response twice inside of the same function.
+                f"{interaction.user.mention} chooses True, {interaction.user.mention} is correct!"
             )
         else:
             await interaction.followup.send(
@@ -61,3 +62,16 @@ class TriviaButtons(discord.ui.View):
             await interaction.followup.send(
                 f"Sorry {interaction.user.mention}, but the answer is {self.correct_answer}."
             )
+
+
+class HelpButtons(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+        self.add_item(
+            discord.ui.Button(
+                label="Discord", url="https://discord.gg/Wy3gwmQVQ"),
+        )
+        self.add_item(
+            discord.ui.Button(
+                label="GitHub", url="https://github.com/XnonXte/XnonBot")
+        )

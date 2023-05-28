@@ -1,4 +1,6 @@
-import requests, json, os
+import requests
+import json
+import os
 from pexels_api import API
 from dotenv import load_dotenv
 
@@ -115,3 +117,10 @@ def get_dad_joke():
     dad_joke_requests = requests.get("https://icanhazdadjoke.com/slack")
     dad_joke_convert_json = json.loads(dad_joke_requests.text)
     return dad_joke_convert_json["attachments"][0]["text"]
+
+
+def get_would_you_rather():
+    wyr_requests = requests.get(
+        "https://would-you-rather-api.abaanshanid.repl.co/")
+    wyr_convert_json = json.loads(wyr_requests.text)
+    return wyr_convert_json["data"]
