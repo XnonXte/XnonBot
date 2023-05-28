@@ -79,14 +79,14 @@ async def on_message(message):
         return
     elif message.content.startswith(f"{prefix}quickstart"):
         await message.channel.send(
-            f"Thank you for using XnonBot! You can start by prompting `/help` to get started."
+            "Thank you for using XnonBot! You can start by prompting `/help` to get started."
         )
 
 
 @xb.command(name="quickstart", description="Sends a quickstart message.")
 async def quickstart(ctx):
     await ctx.respond(
-        f"Thank you for using XnonBot! You can start by prompting `/help` to get started."
+        "Thank you for using XnonBot! You can start by prompting `/help` to get started."
     )
 
 
@@ -446,6 +446,8 @@ async def ping_ctx_menu(ctx, member: discord.Member):
 bot.add_application_command(xb)
 bot.add_application_command(cfg)
 
-# Running the bot.
-# keep_alive.keep_alive()
+# Keep running the bot.
+keep_alive.keep_alive()
+
+# Actually running the bot. 
 bot.run(os.getenv("XNONBOTTOKEN"))
