@@ -1,13 +1,15 @@
+# Update Version Beta 0.4.3 - Added a lot more comments.
 import discord
 import random
 import os
 import html
+import wikipedia
 from dotenv import load_dotenv
 from BotModules import xnonbot_buttons, xnonbot_requests, keep_alive
 
 load_dotenv("C:\Programming\XnonBot\.env")
 
-version = "Beta 0.4.2"
+version = "Beta 0.4.3"
 prefix = ";"
 intents = discord.Intents.default()
 intents.message_content = True
@@ -43,6 +45,8 @@ SLASHCOMMANDS = """
 `gtn` - Plays a guess-the-number game
 `dadjoke` - Gets a random dad joke
 `wyr` - Gets a random would-you-rather question
+`summary` - Gets summary of a Wikipedia article
+`link` - Gets a Wikipedia link
 """
 
 PREFIXEDCOMMANDS = """
@@ -55,9 +59,6 @@ CTXMENUS = """
 `Ping` - Ping a user
 `Repeat` - Repeat a message 
 """
-
-# snipped_message = None
-# edited_message = None
 
 
 # Startup.
@@ -72,23 +73,6 @@ async def on_member_join(ctx, member):
     await ctx.respond(f"Please welcome {member.mention} to the server!")
 
 
-# todo Make these lines of code working somehow.
-# async def on_message_delete(message):
-#     global snipped_author, snipped_message
-#     snipped_message = f"Message: {message.content}"
-#     snipped_author = f"Author: {message.author.id}"
-
-
-# async def on_message_edit(before, after):
-#     global old_message, edited_message, message_author
-#     old_message = before.content
-#     edited_message = after.content
-#     message_author = after.author.id
-
-
-"""Prefixed commands"""
-
-
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
@@ -97,9 +81,6 @@ async def on_message(message):
         await message.channel.send(
             f"Thank you for using XnonBot! You can start by prompting `/help` to get started."
         )
-
-
-"""XnonBot command group"""
 
 
 @xb.command(name="quickstart", description="Sends a quickstart message.")
@@ -115,46 +96,30 @@ async def hello(ctx):
 
 
 @xb.command(description="Overview of available slash commands.")
-async def help(
-    ctx,
-    viewable: discord.Option(
-        bool, description="Viewable to everyone.", required=False
-    ),
-):
+async def help(ctx):
     help_message_embed = discord.Embed(
         description="Thank you for using XnonBot! Created with 💖 by XnonXte.",
         color=discord.Colour.from_rgb(0, 217, 255),
     )
-    help_message_embed.add_field(
-        name="Commands", value=SLASHCOMMANDS, inline=False)
+    help_message_embed.add_field(name="Commands", value=SLASHCOMMANDS, inline=False)
     help_message_embed.add_field(
         name="Prefixed commands", value=PREFIXEDCOMMANDS, inline=False
     )
-    help_message_embed.add_field(
-        name="Context menus", value=CTXMENUS, inline=False)
+    help_message_embed.add_field(name="Context menus", value=CTXMENUS, inline=False)
 
     help_message_embed.set_author(
         name="Help & About",
-        icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
+        icon_url="https://cdn.discordapp.com/attachments/1109857637824204902/1112388247499329657/xnonbot.png",
     )
     help_message_embed.set_footer(
         text=f"XnonBot Version {version}",
-        icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
+        icon_url="https://cdn.discordapp.com/attachments/1109857637824204902/1112388247499329657/xnonbot.png",
     )
     help_message_embed.set_thumbnail(
-        url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png"
+        url="https://cdn.discordapp.com/attachments/1109857637824204902/1112388247499329657/xnonbot.png"
     )
 
-    if viewable == True:
-        ephemeral_message = False
-    else:
-        ephemeral_message = True
-
-    await ctx.respond(
-        embed=help_message_embed,
-        view=xnonbot_buttons.HelpButtons(),
-        ephemeral=ephemeral_message,
-    )
+    await ctx.respond(embed=help_message_embed, view=xnonbot_buttons.HelpButtons())
 
 
 @xb.command(description="Tells the bot to say something.")
@@ -174,7 +139,7 @@ async def github(ctx):
     await ctx.respond("https://github.com/XnonXte/XnonBot")
 
 
-"""Utility command subgroup"""
+"""Utility subgroup"""
 
 
 @util.command(description="Checks the bot's latency.")
@@ -198,25 +163,7 @@ async def convertseconds(
     await ctx.respond(f"{value} seconds is equal to {int(convert)} ticks.")
 
 
-# todo Create a command to fetch a deleted message.
-# @util.command(description="Gets a deleted message.")
-# async def recentdelete(ctx):
-#     if snipped_message is None:
-#         await ctx.respond("There's no message to snipe!")
-#     else:
-#         await ctx.respond(f"{snipped_message}\n{snipped_author}")
-
-
-# @util.command(description="Gets an edited message.")
-# async def recentedit(ctx):
-#     if edited_message is None:
-#         await ctx.respond("There's no message edited!")
-#     else:
-#         await ctx.respond(
-#             f"Old message: {old_message}\nEdited message:{edited_message}\nAuthor: {message_author} "
-#         )
-
-"""Generate command subgroup"""
+"""Generate subgroup"""
 
 
 @gen.command(description="Gets a random quote from zenquotes.io")
@@ -236,7 +183,7 @@ async def waifu(
     ),
 ):
     waifu_pic = xnonbot_requests.get_waifu_pic(category)
-    if waifu_pic is None:
+    if waifu_pic is None:  # If the category that the user requesting doesn't exist
         await ctx.respond("Invalid value, please try again!", ephemeral=True)
         return
 
@@ -247,7 +194,7 @@ async def waifu(
     waifu_embed.set_image(url=waifu_pic)
     waifu_embed.set_footer(
         text=f"XnonBot Version {version}",
-        icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
+        icon_url="https://cdn.discordapp.com/attachments/1109857637824204902/1112388247499329657/xnonbot.png",
     )
 
     await ctx.respond(embed=waifu_embed)
@@ -263,7 +210,7 @@ async def dog(ctx):
     dog_embed.set_image(url=dog)
     dog_embed.set_footer(
         text=f"XnonBot Version {version}",
-        icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
+        icon_url="https://cdn.discordapp.com/attachments/1109857637824204902/1112388247499329657/xnonbot.png",
     )
 
     await ctx.respond(embed=dog_embed)
@@ -279,7 +226,7 @@ async def cat(ctx):
     cat_embed.set_image(url=cat)
     cat_embed.set_footer(
         text=f"XnonBot Version {version}",
-        icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
+        icon_url="https://cdn.discordapp.com/attachments/1109857637824204902/1112388247499329657/xnonbot.png",
     )
 
     await ctx.respond(embed=cat_embed)
@@ -299,7 +246,7 @@ async def pexels(
         pexels_output_embed.set_image(url=image_output)
         pexels_output_embed.set_footer(
             text=f"XnonBot Version {version}",
-            icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
+            icon_url="https://cdn.discordapp.com/attachments/1109857637824204902/1112388247499329657/xnonbot.png",
         )
 
         await ctx.respond(embed=pexels_output_embed)
@@ -319,7 +266,7 @@ async def dadjoke(ctx):
     await ctx.respond(dad_joke)
 
 
-"""Game command subgroup"""
+"""Game subgroup"""
 
 
 @game.command(description="Chooses a random dice roll (1 to 6).")
@@ -336,14 +283,15 @@ async def trivia(
     ),
 ):
     trivia_question = xnonbot_requests.get_trivia(category.lower())
-    if trivia_question is None:
+    if (
+        trivia_question is None
+    ):  # If the category that the user requesting doesn't exist
         await ctx.respond("Invalid value, please try again!", ephemeral=True)
         return
     correct_trivia_answer = trivia_question[2]
 
     await ctx.respond(
-        html.unescape(
-            f"The difficulty is {trivia_question[1]} - {trivia_question[0]}")
+        html.unescape(f"The difficulty is {trivia_question[1]} - {trivia_question[0]}")
     )
 
     await ctx.respond(
@@ -359,14 +307,14 @@ async def gtn(ctx, max: discord.Option(int, description="Maximum number to guess
     await ctx.respond(f"Guess the number (maximum: {max})")
     response = await bot.wait_for(
         "message", check=lambda message: message.author == ctx.author
-    )
+    )  # Tell the bot to wait for a message, it must be sent by the same user.
 
     if int(response.content) == random_number:
         await ctx.send(f"You've guessed it right! The number is {random_number}.")
     elif int(response.content) > max:
         await ctx.send(f"That's too high! The max number is {max}.")
     else:
-        return
+        return  # If the message wasn't an integer.
 
 
 @game.command(description="Plays rock, paper, scissors with the user.")
@@ -404,15 +352,79 @@ async def rps(
     )
     rps_embed.set_footer(
         text=f"XnonBot Version {version}",
-        icon_url="https://cdn.discordapp.com/attachments/1103276522577596527/1111678075952971826/xnonbot.png",
+        icon_url="https://cdn.discordapp.com/attachments/1109857637824204902/1112388247499329657/xnonbot.png",
     )
 
     await ctx.respond(embed=rps_embed)
 
 
-"""Context menus"""
+"""Wikipedia subgroup"""
 
 
+@wk.command(description="Search for a summary in Wikipedia.")
+async def summary(
+    ctx,
+    search: discord.Option(str, description="What to look for and create a summary."),
+):
+    await ctx.channel.trigger_typing()
+
+    try:
+        summary = wikipedia.summary(
+            search, chars=1950
+        )  # The max characters without Nitro are 2000; we want to have 1950 instead and leave some room for others.
+
+        try:
+            await ctx.respond(summary)
+        except:
+            # If the bot can't send interaction response for whatever reason (e.g. bad internet connection).
+            await ctx.send(summary)
+    except Exception as e:
+        await ctx.respond(e, ephemeral=True)
+    except:
+        # Search for a suggestion.
+        suggestions = str(wikipedia.search(search, suggestion=True))
+        try:
+            await ctx.respond(
+                f"The page you're looking for doesn't exist, did you mean {suggestions}?"
+            )
+        except:
+            await ctx.send(
+                f"The page you're looking for doesn't exist, did you mean {suggestions}?"
+            )
+
+
+@wk.command(description="Search for a link in Wikipedia")
+async def link(ctx, query: discord.Option(str, description="The link to search for.")):
+    await ctx.channel.trigger_typing()
+
+    try:
+        link_summary = wikipedia.summary(query, auto_suggest=False)
+        search = query.lower().replace(" ", "_").replace("  ", "_")
+
+        try:
+            await ctx.respond(f"https://en.wikipedia.org/wiki/{search}")
+        except:
+            await ctx.send(f"https://en.wikipedia.org/wiki/{search}")
+    except Exception as e:
+        await ctx.respond(e, ephemeral=True)
+    except:
+        try:
+            await ctx.respond(
+                f"The page you're looking for doesn't exist, did you mean {link_summary}?"
+            )
+        except:
+            await ctx.send(
+                f"The page you're looking for doesn't exist, did you mean {link_summary}?"
+            )
+
+
+# Prompted when the user right-clicked a message.
+@bot.message_command(name="Repeat")
+async def repeat(ctx, message: discord.Message):
+    await ctx.respond(message.content)
+
+
+# Prompted when the user right-clicked a user.
 @bot.user_command(name="Creation date")
 async def creation_date(ctx, member: discord.Member):
     await ctx.respond(
@@ -430,15 +442,7 @@ async def ping_ctx_menu(ctx, member: discord.Member):
     await ctx.respond(f"Hi {member.mention}.")
 
 
-@bot.message_command(name="Repeat")
-async def repeat(ctx, message: discord.Message):
-    await ctx.respond(message.content)
-
-
-"""Config command group"""  # Coming soon
-
-
-# Add the groups we have created earlier to discord.
+# Add the groups that we have created earlier to discord.
 bot.add_application_command(xb)
 bot.add_application_command(cfg)
 

@@ -1,5 +1,6 @@
 # Changelogs
 
+- Update 28/05/2023 - eleasing XnonBot Beta Version 0.4.3, added /summary and /link for Wikipedia integration. Added comments
 - Update 28/05/2023 - Releasing XnonBot Beta Version 0.4.2, added `/wyr` and commands group reworked
 - Update 27/05/2023 - Releasing XnonBot Beta Version 0.4, added embeds for `/help`, `/dog`, `/cat`, `/pexels`, and `/rps`. QoL updates with subgroups reworked
 - Update 24/05/2023 - Releasing XnonBot Beta Version 0.3.5, migrated to py-cord, fixed the issue with embedding messages, added `/latency`, added several subgroups for commands

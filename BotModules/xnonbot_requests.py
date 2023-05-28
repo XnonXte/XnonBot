@@ -120,7 +120,6 @@ def get_dad_joke():
 
 
 def get_would_you_rather():
-    wyr_requests = requests.get(
-        "https://would-you-rather-api.abaanshanid.repl.co/")
+    wyr_requests = requests.get("https://would-you-rather-api.abaanshanid.repl.co/")
     wyr_convert_json = json.loads(wyr_requests.text)
     return wyr_convert_json["data"]
