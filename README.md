@@ -6,4 +6,4 @@ A discord bot developed by XnonXte, written in Python. The official invite link 
 
 ## Get started
 
-`/help` or `;help` on Discord to prompt the list of available commands. As of 18/05/2023, all XnonBot commands will work with slash command.
+`/help` on Discord to prompt the list of available commands. As of 18/05/2023, all XnonBot commands will work with </> command.
