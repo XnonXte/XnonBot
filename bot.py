@@ -42,7 +42,7 @@ SLASHCOMMANDS = """
 `ping` - Checks the bot's latency
 `gtn` - Plays a guess-the-number game
 `dadjoke` - Gets a random dad joke
-`wyr` - Gets a random would-you-rahter question
+`wyr` - Gets a random would-you-rather question
 """
 
 PREFIXEDCOMMANDS = """
@@ -307,13 +307,13 @@ async def pexels(
         await ctx.respond(f"An error has been encountered: {e}", ephemeral=True)
 
 
-@gen.command(description="Generate a random would you rather question.")
+@gen.command(description="Generates a random would you rather question.")
 async def wyr(ctx):
     would_you_rather = xnonbot_requests.get_would_you_rather()
     await ctx.respond(would_you_rather)
 
 
-@gen.command(description="Generate a random dad joke.")
+@gen.command(description="Generates a random dad joke.")
 async def dadjoke(ctx):
     dad_joke = xnonbot_requests.get_dad_joke()
     await ctx.respond(dad_joke)
@@ -432,7 +432,7 @@ async def ping_ctx_menu(ctx, member: discord.Member):
 
 @bot.message_command(name="Repeat")
 async def repeat(ctx, message: discord.Message):
-    await ctx.respond(message)
+    await ctx.respond(message.content)
 
 
 """Config command group"""  # Coming soon
