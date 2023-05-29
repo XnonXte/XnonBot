@@ -1,15 +1,16 @@
-# Update Version Beta 0.4.3 - Added a lot more comments.
+# Update Version Beta 0.4.3.1
 import discord
 import random
 import os
 import html
 import wikipedia
+import textwrap
 from dotenv import load_dotenv
 from BotModules import xnonbot_buttons, xnonbot_requests, keep_alive
 
 load_dotenv("C:\Programming\XnonBot\.env")
 
-version = "Beta 0.4.3"
+version = "Beta 0.4.3.1"
 prefix = ";"
 intents = discord.Intents.default()
 intents.message_content = True
@@ -109,17 +110,19 @@ async def help(ctx):
 
     help_message_embed.set_author(
         name="Help & About",
-        icon_url="https://cdn.discordapp.com/attachments/1109857637824204902/1112388247499329657/xnonbot.png",
+        icon_url="attachment://xnonbot.png",
     )
     help_message_embed.set_footer(
         text=f"XnonBot Version {version}",
-        icon_url="https://cdn.discordapp.com/attachments/1109857637824204902/1112388247499329657/xnonbot.png",
+        icon_url="attachment://xnonbot.png",
     )
-    help_message_embed.set_thumbnail(
-        url="https://cdn.discordapp.com/attachments/1109857637824204902/1112388247499329657/xnonbot.png"
-    )
+    help_message_embed.set_thumbnail(url="attachment://xnonbot.png")
 
-    await ctx.respond(embed=help_message_embed, view=xnonbot_buttons.HelpButtons())
+    await ctx.respond(
+        file=discord.File("Images\\xnonbot.png", filename="xnonbot.png"),
+        embed=help_message_embed,
+        view=xnonbot_buttons.HelpButtons(),
+    )
 
 
 @xb.command(description="Tells the bot to say something.")
@@ -192,10 +195,6 @@ async def waifu(
         description=f"Here's a(n) {category} image for you.",
     )
     waifu_embed.set_image(url=waifu_pic)
-    waifu_embed.set_footer(
-        text=f"XnonBot Version {version}",
-        icon_url="https://cdn.discordapp.com/attachments/1109857637824204902/1112388247499329657/xnonbot.png",
-    )
 
     await ctx.respond(embed=waifu_embed)
 
@@ -208,10 +207,6 @@ async def dog(ctx):
         description="Random dog picture generated.",
     )
     dog_embed.set_image(url=dog)
-    dog_embed.set_footer(
-        text=f"XnonBot Version {version}",
-        icon_url="https://cdn.discordapp.com/attachments/1109857637824204902/1112388247499329657/xnonbot.png",
-    )
 
     await ctx.respond(embed=dog_embed)
 
@@ -224,10 +219,6 @@ async def cat(ctx):
         description="Random cat picture generated.",
     )
     cat_embed.set_image(url=cat)
-    cat_embed.set_footer(
-        text=f"XnonBot Version {version}",
-        icon_url="https://cdn.discordapp.com/attachments/1109857637824204902/1112388247499329657/xnonbot.png",
-    )
 
     await ctx.respond(embed=cat_embed)
 
@@ -244,10 +235,6 @@ async def pexels(
             description=f"Here's a(n) {search_query} image for you.",
         )
         pexels_output_embed.set_image(url=image_output)
-        pexels_output_embed.set_footer(
-            text=f"XnonBot Version {version}",
-            icon_url="https://cdn.discordapp.com/attachments/1109857637824204902/1112388247499329657/xnonbot.png",
-        )
 
         await ctx.respond(embed=pexels_output_embed)
     except Exception as e:
@@ -350,10 +337,6 @@ async def rps(
         name="Results:",
         value=f"You choose ***{choice}***\n Computer chooses ***{bot_choice}***\n\n {output}",
     )
-    rps_embed.set_footer(
-        text=f"XnonBot Version {version}",
-        icon_url="https://cdn.discordapp.com/attachments/1109857637824204902/1112388247499329657/xnonbot.png",
-    )
 
     await ctx.respond(embed=rps_embed)
 
@@ -361,7 +344,7 @@ async def rps(
 """Wikipedia subgroup"""
 
 
-@wk.command(description="Search for a summary in Wikipedia.")
+@wk.command(description="Searches for a summary in Wikipedia.")
 async def summary(
     ctx,
     search: discord.Option(str, description="What to look for and create a summary."),
@@ -369,31 +352,51 @@ async def summary(
     await ctx.channel.trigger_typing()
 
     try:
-        summary = wikipedia.summary(
-            search, chars=1950
-        )  # The max characters without Nitro are 2000; we want to have 1950 instead and leave some room for others.
+        wikipedia_page = wikipedia.page(search)
+        wikipedia_summary = wikipedia_page.summary
+        wikipedia_url = wikipedia_page.url
 
-        try:
-            await ctx.respond(summary)
-        except:
-            # If the bot can't send interaction response for whatever reason (e.g. bad internet connection).
-            await ctx.send(summary)
-    except Exception as e:
-        await ctx.respond(e, ephemeral=True)
-    except:
-        # Search for a suggestion.
-        suggestions = str(wikipedia.search(search, suggestion=True))
+        chars_limit = 950
+        if (
+            len(wikipedia_summary) > chars_limit
+        ):  # We want it to be less than 1054 characters.
+            wikipedia_summary = textwrap.shorten(wikipedia_summary, width=chars_limit)
+
+        wikipedia_summary_embed = discord.Embed(
+            title=f"Wikipedia summary of {search}",
+            color=discord.Color.from_rgb(0, 217, 255),
+        )
+        wikipedia_summary_embed.add_field(name="Summary", value=wikipedia_summary)
+        wikipedia_summary_embed.add_field(
+            name="Original link", value=wikipedia_url, inline=False
+        )
+        wikipedia_summary_embed.set_thumbnail(url="attachment://wikipedia.png")
+
         try:
             await ctx.respond(
-                f"The page you're looking for doesn't exist, did you mean {suggestions}?"
-            )
+                file=discord.File("Images\\wikipedia.png", filename="wikipedia.png"),
+                embed=wikipedia_summary_embed,
+            )  # If the bot can't send an interaction response for whatever reason.
         except:
             await ctx.send(
-                f"The page you're looking for doesn't exist, did you mean {suggestions}?"
+                file=discord.File("Images\\wikipedia.png", filename="wikipedia.png"),
+                embed=wikipedia_summary_embed,
             )
+    except wikipedia.DisambiguationError as e:
+        exception_embed = discord.Embed(
+            title="DisambiguationError, please specify your search query with the options below",
+            color=discord.Color.from_rgb(0, 217, 255),
+        )
+        exception_embed.add_field(name=f"{search} may refer to:", value=e.options)
+
+        await ctx.respond(
+            f"Oops, an error occured!", embed=exception_embed, ephemeral=True
+        )
+    except Exception as e:
+        await ctx.respond(e, ephemeral=True)
 
 
-@wk.command(description="Search for a link in Wikipedia")
+@wk.command(description="Searches for a link in Wikipedia")
 async def link(ctx, query: discord.Option(str, description="The link to search for.")):
     await ctx.channel.trigger_typing()
 
@@ -401,21 +404,38 @@ async def link(ctx, query: discord.Option(str, description="The link to search f
         link_summary = wikipedia.summary(query, auto_suggest=False)
         search = query.lower().replace(" ", "_").replace("  ", "_")
 
-        try:
-            await ctx.respond(f"https://en.wikipedia.org/wiki/{search}")
-        except:
-            await ctx.send(f"https://en.wikipedia.org/wiki/{search}")
-    except Exception as e:
-        await ctx.respond(e, ephemeral=True)
-    except:
+        wikipedia_link_embed = discord.Embed(
+            title="I've got one!",
+            color=discord.Color.from_rgb(0, 217, 255),
+        )
+        wikipedia_link_embed.add_field(
+            name=f"Wikipedia link for {query}",
+            value=f"https://en.wikipedia.org/wiki/{search}",
+        )
+        wikipedia_link_embed.set_thumbnail(url="attachment://wikipedia.png")
+
         try:
             await ctx.respond(
-                f"The page you're looking for doesn't exist, did you mean {link_summary}?"
+                file=discord.File("Images\\wikipedia.png", filename="wikipedia.png"),
+                embed=wikipedia_link_embed,
             )
         except:
             await ctx.send(
-                f"The page you're looking for doesn't exist, did you mean {link_summary}?"
+                file=discord.File("Images\\wikipedia.png", filename="wikipedia.png"),
+                embed=wikipedia_link_embed,
             )
+    except wikipedia.DisambiguationError as e:
+        exception_embed = discord.Embed(
+            title="DisambiguationError, please specify your search query with the options below",
+            color=discord.Color.from_rgb(0, 217, 255),
+        )
+        exception_embed.add_field(name=f"{query} may refer to:", value=e.options)
+
+        await ctx.respond(
+            f"Oops, an error occured!", embed=exception_embed, ephemeral=True
+        )
+    except Exception as e:
+        await ctx.respond(e, ephemeral=True)
 
 
 # Prompted when the user right-clicked a message.
@@ -447,7 +467,7 @@ bot.add_application_command(xb)
 bot.add_application_command(cfg)
 
 # Keep running the bot.
-keep_alive.keep_alive()
+# keep_alive.keep_alive() - Off for the time being.
 
-# Actually running the bot. 
+# Actually running the bot.
 bot.run(os.getenv("XNONBOTTOKEN"))
