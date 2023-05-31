@@ -1,4 +1,3 @@
-# Update Version Beta 0.4.3.1
 import discord
 import random
 import os
@@ -6,11 +5,11 @@ import html
 import wikipedia
 import textwrap
 from dotenv import load_dotenv
-from BotModules import xnonbot_buttons, xnonbot_requests, keep_alive
+from XnonBotModules import bot_requests, components, keep_alive
 
 load_dotenv("C:\Programming\XnonBot\.env")
 
-version = "Beta 0.4.3.1"
+version = "Beta 0.4.3.2"
 prefix = ";"
 intents = discord.Intents.default()
 intents.message_content = True
@@ -29,12 +28,10 @@ wk = xb.create_subgroup("wikipedia", "wikipedia related commands")
 SLASHCOMMANDS = """
 `quickstart` - Sends a quickstart message
 `help` - Prompts help message
-`github` - Github page for this bot
 `about` - Sends information regarding this bot
 `quote` - Sends a random inspirational quote
 `roll` - Sends a random dice roll result, from 1 to 6
 `rps` - Plays rock, paper, scissors with the user
-`say` - Tell the bot to say something
 `cat` - Sends a random cat picture
 `dog` - Sends a random dog picture
 `waifu` - Sends a random waifu picture (it's SFW!)
@@ -50,22 +47,24 @@ SLASHCOMMANDS = """
 `link` - Gets a Wikipedia link
 """
 
-PREFIXEDCOMMANDS = """
-`quickstart` - Sends a quickstart message
-"""
 
-CTXMENUS = """
-`Join date` - Gets the join date for a user
-`Created at` - Gets the creation date for a user
-`Ping` - Ping a user
-`Repeat` - Repeat a message 
-"""
-
-
-# Startup.
 @bot.event
 async def on_ready():
-    print(f"We have logged in as {bot.user}!")
+    print(
+        """
+db    db d8b   db  .d88b.  d8b   db d8888b.  .d88b.  d888888b 
+`8b  d8' 888o  88 .8P  Y8. 888o  88 88  `8D .8P  Y8. `~~88~~' 
+ `8bd8'  88V8o 88 88    88 88V8o 88 88oooY' 88    88    88    
+ .dPYb.  88 V8o88 88    88 88 V8o88 88~~~b. 88    88    88    
+.8P  Y8. 88  V888 `8b  d8' 88  V888 88   8D `8b  d8'    88    
+YP    YP VP   V8P  `Y88P'  VP   V8P Y8888P'  `Y88P'     YP    
+                                                              
+                                                              
+"""
+    )
+    print(
+        f"We have logged in as {bot.user}. | Visit my GitHub: https://github.com/XnonXte"
+    )
 
 
 # Events that read message contents.
@@ -82,6 +81,9 @@ async def on_message(message):
         await message.channel.send(
             "Thank you for using XnonBot! You can start by prompting `/help` to get started."
         )
+
+
+"""XnonBot command group"""
 
 
 @xb.command(name="quickstart", description="Sends a quickstart message.")
@@ -102,11 +104,7 @@ async def help(ctx):
         description="Thank you for using XnonBot! Created with 💖 by XnonXte.",
         color=discord.Colour.from_rgb(0, 217, 255),
     )
-    help_message_embed.add_field(name="Commands", value=SLASHCOMMANDS, inline=False)
-    help_message_embed.add_field(
-        name="Prefixed commands", value=PREFIXEDCOMMANDS, inline=False
-    )
-    help_message_embed.add_field(name="Context menus", value=CTXMENUS, inline=False)
+    help_message_embed.add_field(name="Commands", value=SLASHCOMMANDS)
 
     help_message_embed.set_author(
         name="Help & About",
@@ -119,21 +117,9 @@ async def help(ctx):
     help_message_embed.set_thumbnail(url="attachment://xnonbot.png")
 
     await ctx.respond(
-        file=discord.File("Images\\xnonbot.png", filename="xnonbot.png"),
+        file=discord.File("local\\xnonbot.png", filename="xnonbot.png"),
         embed=help_message_embed,
-        view=xnonbot_buttons.HelpButtons(),
-    )
-
-
-@xb.command(description="Tells the bot to say something.")
-async def say(ctx, message: discord.Option(str, description="Message to send.")):
-    await ctx.respond(f"{ctx.user.mention} said: `{message}`")
-
-
-@xb.command(description="Sends the information about this bot.")
-async def about(ctx):
-    await ctx.respond(
-        "I'm a chat-bot developed by XnonXte! My code is available on GitHub (/github)."
+        view=components.HelpButtons(),
     )
 
 
@@ -171,7 +157,7 @@ async def convertseconds(
 
 @gen.command(description="Gets a random quote from zenquotes.io")
 async def quote(ctx):
-    quote = xnonbot_requests.get_quote()
+    quote = bot_requests.get_quote()
     await ctx.respond(quote)
 
 
@@ -185,7 +171,7 @@ async def waifu(
         description="Select the category (Example 'waifu', please refer to https://waifu.pics/docs for more categories!)",
     ),
 ):
-    waifu_pic = xnonbot_requests.get_waifu_pic(category)
+    waifu_pic = bot_requests.get_waifu_pic(category)
     if waifu_pic is None:  # If the category that the user requesting doesn't exist
         await ctx.respond("Invalid value, please try again!", ephemeral=True)
         return
@@ -201,7 +187,7 @@ async def waifu(
 
 @gen.command(description="Gets a random dog picture from https://dog.ceo/dog-api")
 async def dog(ctx):
-    dog = xnonbot_requests.get_dog_pic()
+    dog = bot_requests.get_dog_pic()
     dog_embed = discord.Embed(
         title="Bark!",
         description="Random dog picture generated.",
@@ -213,7 +199,7 @@ async def dog(ctx):
 
 @gen.command(description="Gets a random cat picture from https://thecatapi.com")
 async def cat(ctx):
-    cat = xnonbot_requests.get_cat_pic()
+    cat = bot_requests.get_cat_pic()
     cat_embed = discord.Embed(
         title="Meow!",
         description="Random cat picture generated.",
@@ -228,7 +214,7 @@ async def pexels(
     ctx, search_query: discord.Option(str, description="Image to search.")
 ):
     try:
-        image_output = xnonbot_requests.get_pexels_photos(search_query)
+        image_output = bot_requests.get_pexels_photos(search_query)
 
         pexels_output_embed = discord.Embed(
             title="Image from pexels generated!",
@@ -243,13 +229,13 @@ async def pexels(
 
 @gen.command(description="Generates a random would you rather question.")
 async def wyr(ctx):
-    would_you_rather = xnonbot_requests.get_would_you_rather()
+    would_you_rather = bot_requests.get_would_you_rather()
     await ctx.respond(would_you_rather)
 
 
 @gen.command(description="Generates a random dad joke.")
 async def dadjoke(ctx):
-    dad_joke = xnonbot_requests.get_dad_joke()
+    dad_joke = bot_requests.get_dad_joke()
     await ctx.respond(dad_joke)
 
 
@@ -269,7 +255,7 @@ async def trivia(
         description="Choose the category (Example 'animal', refer to the GitHub page for more categories).",
     ),
 ):
-    trivia_question = xnonbot_requests.get_trivia(category.lower())
+    trivia_question = bot_requests.get_trivia(category.lower())
     if (
         trivia_question is None
     ):  # If the category that the user requesting doesn't exist
@@ -283,7 +269,7 @@ async def trivia(
 
     await ctx.respond(
         f"Please select your answer!",
-        view=xnonbot_buttons.TriviaButtons(ctx.author, correct_trivia_answer),
+        view=components.TriviaButtons(ctx.author, correct_trivia_answer),
     )
 
 
@@ -374,12 +360,15 @@ async def summary(
 
         try:
             await ctx.respond(
-                file=discord.File("Images\\wikipedia.png", filename="wikipedia.png"),
+                file=discord.File("local\\wikipedia.png", filename="wikipedia.png"),
                 embed=wikipedia_summary_embed,
             )  # If the bot can't send an interaction response for whatever reason.
         except:
             await ctx.send(
-                file=discord.File("Images\\wikipedia.png", filename="wikipedia.png"),
+                file=discord.File(
+                    "local\\wikipedia.png",
+                    filename="wikipedia.png",
+                ),
                 embed=wikipedia_summary_embed,
             )
     except wikipedia.DisambiguationError as e:
@@ -416,12 +405,12 @@ async def link(ctx, query: discord.Option(str, description="The link to search f
 
         try:
             await ctx.respond(
-                file=discord.File("Images\\wikipedia.png", filename="wikipedia.png"),
+                file=discord.File("local\\wikipedia.png", filename="wikipedia.png"),
                 embed=wikipedia_link_embed,
             )
         except:
             await ctx.send(
-                file=discord.File("Images\\wikipedia.png", filename="wikipedia.png"),
+                file=discord.File("local\\wikipedia.png", filename="wikipedia.png"),
                 embed=wikipedia_link_embed,
             )
     except wikipedia.DisambiguationError as e:
@@ -438,13 +427,14 @@ async def link(ctx, query: discord.Option(str, description="The link to search f
         await ctx.respond(e, ephemeral=True)
 
 
-# Prompted when the user right-clicked a message.
+"""Context menus"""
+
+
 @bot.message_command(name="Repeat")
 async def repeat(ctx, message: discord.Message):
     await ctx.respond(message.content)
 
 
-# Prompted when the user right-clicked a user.
 @bot.user_command(name="Creation date")
 async def creation_date(ctx, member: discord.Member):
     await ctx.respond(
@@ -467,7 +457,7 @@ bot.add_application_command(xb)
 bot.add_application_command(cfg)
 
 # Keep running the bot.
-# keep_alive.keep_alive() - Off for the time being.
+keep_alive.keep_alive()
 
 # Actually running the bot.
 bot.run(os.getenv("XNONBOTTOKEN"))
