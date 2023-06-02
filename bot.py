@@ -8,13 +8,13 @@ import asyncio
 from dotenv import load_dotenv
 from BotModules import keep_alive, xnonbot_components, xnonbot_requests
 
-load_dotenv("C:\Programming\XnonBot\.env")
+load_dotenv("C:\Programming\XnonBot\dev.env")
 
 version = "v0.4.4.1"
-prefix = ";"
+
 intents = discord.Intents.default()
 intents.message_content = True
-bot = discord.Bot(command_prefix=prefix, intents=intents)
+bot = discord.Bot(intents=intents)
 
 # Command groups.
 gen = discord.SlashCommandGroup("generate", "generate related command")
@@ -87,7 +87,7 @@ async def help(ctx):
     help_message_embed.set_thumbnail(url="attachment://xnonbot.png")
 
     await ctx.respond(
-        file=discord.File("local\\xnonbot.png", filename="xnonbot.png"),
+        file=discord.File("local/xnonbot.png", filename="xnonbot.png"),
         embed=help_message_embed,
         view=xnonbot_components.HelpButtons(),
     )
@@ -216,7 +216,7 @@ async def trivia(
     ctx,
     category: discord.Option(
         choices=xnonbot_requests.trivia_categories,
-        description="Please select the category.",
+        description="Select the category.",
     ),
     game_type: discord.Option(
         choices=["True or False", "Multiple answers"],
@@ -231,10 +231,10 @@ async def trivia(
         )
         trivia_true_or_false_embed.add_field(
             name="Question",
-            value=f"{html.unescape(trivia_requests[0])}\n\nAnswers in True or False!",
+            value=f"{html.unescape(trivia_requests[0])} (The difficulty is {trivia_requests[1]}).\n\nAnswers in True or False!",
         )
         trivia_true_or_false_embed.set_footer(
-            text=f"Category: {category[0].upper() + category[1:]}, the difficulty is {trivia_requests[1]} - Powered by opentdb.com"  # We want the category to start with a capital letter.
+            text=f"{category[0].upper() + category[1:]} trivia - Powered by opentdb.com"  # We want the category to start with a capital letter.
         )
         trivia_true_or_false_embed.set_thumbnail(url="attachment://opentdb.png")
 
@@ -281,10 +281,10 @@ async def trivia(
         )
         trivia_multiple_answers_embed.add_field(
             name="Question",
-            value=f"{html.unescape(trivia_requests[0])}\n\n{answers_list[0]}, {answers_list[1]}, {answers_list[2]}, or {answers_list[3]}",
+            value=f"{html.unescape(trivia_requests[0])} (The difficulty is {trivia_requests[1]}).\n\n{answers_list[0]}, {answers_list[1]}, {answers_list[2]}, or {answers_list[3]}.",
         )
         trivia_multiple_answers_embed.set_footer(
-            text=f"Category: {category[0].upper() + category[1:]}, the difficulty is {trivia_requests[1]} - Powered by opentdb.com"
+            text=f"{category[0].upper() + category[1:]} trivia - Powered by opentdb.com"
         )
         trivia_multiple_answers_embed.set_thumbnail(url="attachment://opentdb.png")
 
@@ -324,14 +324,14 @@ async def gtn(ctx, max: discord.Option(int, description="Maximum number to guess
     await ctx.respond(f"Guess the number (maximum: {max})")
     response = await bot.wait_for(
         "message", check=lambda message: message.author == ctx.author
-    )  # Tell the bot to wait for a message, it must be sent by the same user.
+    )  # Tells the bot to wait for a message, it must be sent by the same user.
 
     if int(response.content) == random_number:
         await ctx.send(f"you have guessed it right! The number is {random_number}.")
     elif int(response.content) > max:
         await ctx.send(f"That's too high! The max number is {max}.")
     else:
-        return  # If the message wasn't an integer.
+        return  # If the response message wasn't an integer.
 
 
 @game.command(description="Plays rock, paper, scissors with the user.")
@@ -400,23 +400,25 @@ async def summary(
 
         try:
             await ctx.respond(
-                file=discord.File("local\\wikipedia.png", filename="wikipedia.png"),
+                file=discord.File("local/wikipedia.png", filename="wikipedia.png"),
                 embed=wikipedia_summary_embed,
             )  # If the bot can't send an interaction response for whatever reason.
         except:
             await ctx.send(
                 file=discord.File(
-                    "local\\wikipedia.png",
+                    "local/wikipedia.png",
                     filename="wikipedia.png",
                 ),
                 embed=wikipedia_summary_embed,
             )
     except wikipedia.DisambiguationError as e:
+        options_list = str(option + ", " for option in e.options)
+
         exception_embed = discord.Embed(
             title="DisambiguationError, please specify your search query with the options below",
             color=discord.Color.from_rgb(0, 217, 255),
         )
-        exception_embed.add_field(name=f"{search} may refer to:", value=e.options)
+        exception_embed.add_field(name=f"{search} may refer to:", value=options_list)
 
         await ctx.respond(
             "Oops, an error occured!", embed=exception_embed, ephemeral=True
@@ -447,20 +449,22 @@ async def link(ctx, query: discord.Option(str, description="The link to search f
 
         try:
             await ctx.respond(
-                file=discord.File("local\\wikipedia.png", filename="wikipedia.png"),
+                file=discord.File("local/wikipedia.png", filename="wikipedia.png"),
                 embed=wikipedia_link_embed,
             )
         except:
             await ctx.send(
-                file=discord.File("local\\wikipedia.png", filename="wikipedia.png"),
+                file=discord.File("local/wikipedia.png", filename="wikipedia.png"),
                 embed=wikipedia_link_embed,
             )
     except wikipedia.DisambiguationError as e:
+        options_list = str(option + ", " for option in e.options)
+
         exception_embed = discord.Embed(
             title="DisambiguationError, please specify your search query with the options below",
             color=discord.Color.from_rgb(0, 217, 255),
         )
-        exception_embed.add_field(name=f"{query} may refer to:", value=e.options)
+        exception_embed.add_field(name=f"{search} may refer to:", value=options_list)
 
         await ctx.respond(
             "Oops, an error occured!", embed=exception_embed, ephemeral=True

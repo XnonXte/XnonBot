@@ -4,7 +4,7 @@ import os
 from pexels_api import API
 from dotenv import load_dotenv
 
-load_dotenv("C:\Programming\XnonBot\.env")
+load_dotenv("C:\Programming\XnonBot\dev.env")
 
 # The max list for choices in discord.Option is 25, we can't have all the categories sadly, I'm only putting 20 here.
 waifu_categories = [
