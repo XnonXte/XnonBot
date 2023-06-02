@@ -4,26 +4,23 @@ import os
 import html
 import wikipedia
 import textwrap
+import asyncio
 from dotenv import load_dotenv
-from XnonBotModules import bot_requests, components, keep_alive
+from BotModules import keep_alive, xnonbot_components, xnonbot_requests
 
 load_dotenv("C:\Programming\XnonBot\.env")
 
-version = "Beta 0.4.3.2"
+version = "v0.4.4.1"
 prefix = ";"
 intents = discord.Intents.default()
 intents.message_content = True
 bot = discord.Bot(command_prefix=prefix, intents=intents)
 
 # Command groups.
-xb = discord.SlashCommandGroup("xnonbot", "general commands")
-cfg = discord.SlashCommandGroup("config", "moderator only commands")
-
-# Subgroups of the group xb.
-gen = xb.create_subgroup("generate", "generate related command")
-game = xb.create_subgroup("game", "games related commmands")
-util = xb.create_subgroup("utility", "utilities related commands")
-wk = xb.create_subgroup("wikipedia", "wikipedia related commands")
+gen = discord.SlashCommandGroup("generate", "generate related command")
+game = discord.SlashCommandGroup("game", "games related commmands")
+util = discord.SlashCommandGroup("utility", "utilities related commands")
+wk = discord.SlashCommandGroup("wikipedia", "wikipedia related commands")
 
 SLASHCOMMANDS = """
 `quickstart` - Sends a quickstart message
@@ -34,11 +31,10 @@ SLASHCOMMANDS = """
 `rps` - Plays rock, paper, scissors with the user
 `cat` - Sends a random cat picture
 `dog` - Sends a random dog picture
-`waifu` - Sends a random waifu picture (it's SFW!)
+`waifu` - Sends a random waifu picture
 `pexels` - Search for an image on pexels.com
-`trivia` - Sends a random  trivia question and asking the user whether it's true or false
-`convertticks` - Converts ticks to seconds
-`convertseconds` - Converts seconds to ticks
+`trivia` - Sends a random  trivia question and asking the user whether it is True or False
+`conversion_ticks` - Converts ticks to seconds and vice versa
 `ping` - Checks the bot's latency
 `gtn` - Plays a guess-the-number game
 `dadjoke` - Gets a random dad joke
@@ -51,54 +47,28 @@ SLASHCOMMANDS = """
 @bot.event
 async def on_ready():
     print(
-        """
-db    db d8b   db  .d88b.  d8b   db d8888b.  .d88b.  d888888b 
-`8b  d8' 888o  88 .8P  Y8. 888o  88 88  `8D .8P  Y8. `~~88~~' 
- `8bd8'  88V8o 88 88    88 88V8o 88 88oooY' 88    88    88    
- .dPYb.  88 V8o88 88    88 88 V8o88 88~~~b. 88    88    88    
-.8P  Y8. 88  V888 `8b  d8' 88  V888 88   8D `8b  d8'    88    
-YP    YP VP   V8P  `Y88P'  VP   V8P Y8888P'  `Y88P'     YP    
-                                                              
-                                                              
-"""
-    )
-    print(
-        f"We have logged in as {bot.user}. | Visit my GitHub: https://github.com/XnonXte"
+        f"The bot is now running as {bot.user} - Visit my GitHub: https://github.com/XnonXte"
     )
 
 
-# Events that read message contents.
 @bot.event
 async def on_member_join(ctx, member):
     await ctx.respond(f"Please welcome {member.mention} to the server!")
 
 
-@bot.event
-async def on_message(message):
-    if message.author == bot.user:
-        return
-    elif message.content.startswith(f"{prefix}quickstart"):
-        await message.channel.send(
-            "Thank you for using XnonBot! You can start by prompting `/help` to get started."
-        )
-
-
-"""XnonBot command group"""
-
-
-@xb.command(name="quickstart", description="Sends a quickstart message.")
+@bot.command(description="Sends a quickstart message.")
 async def quickstart(ctx):
     await ctx.respond(
         "Thank you for using XnonBot! You can start by prompting `/help` to get started."
     )
 
 
-@xb.command(description="Says hello to the user.")
+@bot.command(description="Says hello to the user.")
 async def hello(ctx):
     await ctx.respond(f"Hello {ctx.user.mention}!")
 
 
-@xb.command(description="Overview of available slash commands.")
+@bot.command(description="Overview of available slash commands.")
 async def help(ctx):
     help_message_embed = discord.Embed(
         description="Thank you for using XnonBot! Created with 💖 by XnonXte.",
@@ -119,16 +89,16 @@ async def help(ctx):
     await ctx.respond(
         file=discord.File("local\\xnonbot.png", filename="xnonbot.png"),
         embed=help_message_embed,
-        view=components.HelpButtons(),
+        view=xnonbot_components.HelpButtons(),
     )
 
 
-@xb.command(description="Official GitHub page for this bot.")
+@bot.command(description="Official GitHub page for this bot.")
 async def github(ctx):
     await ctx.respond("https://github.com/XnonXte/XnonBot")
 
 
-"""Utility subgroup"""
+"""Utility command group"""
 
 
 @util.command(description="Checks the bot's latency.")
@@ -136,46 +106,40 @@ async def ping(ctx):
     await ctx.respond(f"Pong! My ping is {round(bot.latency * 100, 2)}ms.")
 
 
-@util.command(description="Converts ticks to seconds.")
-async def convertticks(
-    ctx, value: discord.Option(str, description="Enter the value in ticks.")
+@util.command(description="Converts tick to second and vice versa.")
+async def conversion_ticks(
+    ctx,
+    value: discord.Option(float, description="Enter the value."),
+    value_type: discord.Option(
+        choices=["ticks", "seconds"],
+        description="Select which value_type are you inputting.",
+    ),
 ):
-    convert = value * 0.015
-    await ctx.respond(f"{value} ticks is equal to {convert} seconds.")
+    if value_type == "ticks":
+        calculate = value * 0.015
+        await ctx.respond(f"{value} ticks equals to {calculate} seconds.")
+    elif value_type == "seconds":
+        calculate = value / 0.015
+        await ctx.respond(f"{value} seconds equals to {calculate} ticks.")
 
 
-@util.command(description="Converts seconds to ticks.")
-async def convertseconds(
-    ctx, value: discord.Option(float, description="Enter the value in seconds.")
-):
-    convert = value / 0.015
-    await ctx.respond(f"{value} seconds is equal to {int(convert)} ticks.")
-
-
-"""Generate subgroup"""
+"""Generate command group"""
 
 
 @gen.command(description="Gets a random quote from zenquotes.io")
 async def quote(ctx):
-    quote = bot_requests.get_quote()
+    quote = xnonbot_requests.get_quote()
     await ctx.respond(quote)
 
 
-@gen.command(
-    description="Gets a random waifu picture from https://waifu.pics/docs (It's SFW!)"
-)
+@gen.command(description="Gets a random waifu picture from https://waifu.pics/docs")
 async def waifu(
     ctx,
     category: discord.Option(
-        str,
-        description="Select the category (Example 'waifu', please refer to https://waifu.pics/docs for more categories!)",
+        choices=xnonbot_requests.waifu_categories, description="Chose the category."
     ),
 ):
-    waifu_pic = bot_requests.get_waifu_pic(category)
-    if waifu_pic is None:  # If the category that the user requesting doesn't exist
-        await ctx.respond("Invalid value, please try again!", ephemeral=True)
-        return
-
+    waifu_pic = xnonbot_requests.get_waifu_pic(category)
     waifu_embed = discord.Embed(
         title="Waifu generated!",
         description=f"Here's a(n) {category} image for you.",
@@ -187,7 +151,7 @@ async def waifu(
 
 @gen.command(description="Gets a random dog picture from https://dog.ceo/dog-api")
 async def dog(ctx):
-    dog = bot_requests.get_dog_pic()
+    dog = xnonbot_requests.get_dog_pic()
     dog_embed = discord.Embed(
         title="Bark!",
         description="Random dog picture generated.",
@@ -199,7 +163,7 @@ async def dog(ctx):
 
 @gen.command(description="Gets a random cat picture from https://thecatapi.com")
 async def cat(ctx):
-    cat = bot_requests.get_cat_pic()
+    cat = xnonbot_requests.get_cat_pic()
     cat_embed = discord.Embed(
         title="Meow!",
         description="Random cat picture generated.",
@@ -214,7 +178,7 @@ async def pexels(
     ctx, search_query: discord.Option(str, description="Image to search.")
 ):
     try:
-        image_output = bot_requests.get_pexels_photos(search_query)
+        image_output = xnonbot_requests.get_pexels_photos(search_query)
 
         pexels_output_embed = discord.Embed(
             title="Image from pexels generated!",
@@ -229,17 +193,17 @@ async def pexels(
 
 @gen.command(description="Generates a random would you rather question.")
 async def wyr(ctx):
-    would_you_rather = bot_requests.get_would_you_rather()
+    would_you_rather = xnonbot_requests.get_would_you_rather()
     await ctx.respond(would_you_rather)
 
 
 @gen.command(description="Generates a random dad joke.")
 async def dadjoke(ctx):
-    dad_joke = bot_requests.get_dad_joke()
+    dad_joke = xnonbot_requests.get_dad_joke()
     await ctx.respond(dad_joke)
 
 
-"""Game subgroup"""
+"""Game command group"""
 
 
 @game.command(description="Chooses a random dice roll (1 to 6).")
@@ -247,30 +211,110 @@ async def roll(ctx):
     await ctx.respond(random.randint(1, 6))
 
 
-@game.command(description="Plays a trivia game from https://opentdb.com")
+@game.command(description="Plays a trivia game.")
 async def trivia(
     ctx,
     category: discord.Option(
-        str,
-        description="Choose the category (Example 'animal', refer to the GitHub page for more categories).",
+        choices=xnonbot_requests.trivia_categories,
+        description="Please select the category.",
+    ),
+    game_type: discord.Option(
+        choices=["True or False", "Multiple answers"],
+        description="Select the game type.",
     ),
 ):
-    trivia_question = bot_requests.get_trivia(category.lower())
-    if (
-        trivia_question is None
-    ):  # If the category that the user requesting doesn't exist
-        await ctx.respond("Invalid value, please try again!", ephemeral=True)
-        return
-    correct_trivia_answer = trivia_question[2]
+    if game_type == "True or False":
+        trivia_requests = xnonbot_requests.get_trivia_legacy(category)
 
-    await ctx.respond(
-        html.unescape(f"The difficulty is {trivia_question[1]} - {trivia_question[0]}")
-    )
+        trivia_true_or_false_embed = discord.Embed(
+            title=f"True or False Trivia", color=discord.Color.from_rgb(0, 217, 255)
+        )
+        trivia_true_or_false_embed.add_field(
+            name="Question",
+            value=f"{html.unescape(trivia_requests[0])}\n\nAnswers in True or False!",
+        )
+        trivia_true_or_false_embed.set_footer(
+            text=f"Category: {category[0].upper() + category[1:]}, the difficulty is {trivia_requests[1]} - Powered by opentdb.com"  # We want the category to start with a capital letter.
+        )
+        trivia_true_or_false_embed.set_thumbnail(url="attachment://opentdb.png")
 
-    await ctx.respond(
-        f"Please select your answer!",
-        view=components.TriviaButtons(ctx.author, correct_trivia_answer),
-    )
+        await ctx.respond(
+            "You have 15 seconds to answer!",
+            file=discord.File("local/opentriviadatabase.png", filename="opentdb.png"),
+            embed=trivia_true_or_false_embed,
+        )
+
+        try:
+            trivia_response = await bot.wait_for(  # Checks if the user responding is the same as the one requesting the initial interaction.
+                "message",
+                check=lambda message: message.author.id == ctx.author.id
+                and message.channel.id == ctx.channel.id
+                and message.content.lower()
+                in [
+                    "true",
+                    "false",
+                ],  # We want to ignore everything except "true" or "false".
+                timeout=15,
+            )
+            if trivia_response.content.lower() == trivia_requests[2].lower():
+                await ctx.send("You're correct!")
+            else:
+                await ctx.send(
+                    f"Sorry, but the correct answer was {trivia_requests[2]}"
+                )
+        except asyncio.TimeoutError:
+            await ctx.send(
+                f"{ctx.user.mention} you have exceeded the time limit, please try again!"
+            )
+
+    elif game_type == "Multiple answers":
+        trivia_requests = xnonbot_requests.get_trivia(category)
+        answers_list = trivia_requests[3] + [trivia_requests[2]]
+        random.shuffle(answers_list)
+
+        answers_check = tuple(
+            answer.lower() for answer in answers_list
+        )  # Makes all the answers lowercase so then they become case-insensitive.
+
+        trivia_multiple_answers_embed = discord.Embed(
+            title=f"Multiple Answers Trivia", color=discord.Color.from_rgb(0, 217, 255)
+        )
+        trivia_multiple_answers_embed.add_field(
+            name="Question",
+            value=f"{html.unescape(trivia_requests[0])}\n\n{answers_list[0]}, {answers_list[1]}, {answers_list[2]}, or {answers_list[3]}",
+        )
+        trivia_multiple_answers_embed.set_footer(
+            text=f"Category: {category[0].upper() + category[1:]}, the difficulty is {trivia_requests[1]} - Powered by opentdb.com"
+        )
+        trivia_multiple_answers_embed.set_thumbnail(url="attachment://opentdb.png")
+
+        await ctx.respond(
+            "You have 30 seconds to answer!",
+            file=discord.File(
+                "C:\Programming\XnonBot\local\opentriviadatabase.png",
+                filename="opentdb.png",
+            ),
+            embed=trivia_multiple_answers_embed,
+        )
+
+        try:
+            trivia_response = await bot.wait_for(
+                "message",
+                check=lambda message: message.author.id == ctx.author.id
+                and message.channel.id == ctx.channel.id
+                and message.content.lower() in answers_check,
+                timeout=30,
+            )
+            if trivia_response.content.lower() == trivia_requests[2].lower():
+                await ctx.send("You're correct!")
+            else:
+                await ctx.send(
+                    f"Sorry, but the correct answer was {trivia_requests[2]}"
+                )
+        except asyncio.TimeoutError:
+            await ctx.send(
+                f"{ctx.user.mention} you have exceeded the time limit, please try again!"
+            )
 
 
 @game.command(description="Guess the number game.")
@@ -283,7 +327,7 @@ async def gtn(ctx, max: discord.Option(int, description="Maximum number to guess
     )  # Tell the bot to wait for a message, it must be sent by the same user.
 
     if int(response.content) == random_number:
-        await ctx.send(f"You've guessed it right! The number is {random_number}.")
+        await ctx.send(f"you have guessed it right! The number is {random_number}.")
     elif int(response.content) > max:
         await ctx.send(f"That's too high! The max number is {max}.")
     else:
@@ -293,25 +337,21 @@ async def gtn(ctx, max: discord.Option(int, description="Maximum number to guess
 @game.command(description="Plays rock, paper, scissors with the user.")
 async def rps(
     ctx,
-    choice: discord.Option(str, description="Choose either rock, paper, or scissors."),
+    choice: discord.Option(
+        choices=["rock", "paper", "scissors"],
+        description="Choose either rock, paper, or scissors.",
+    ),
 ):
-    rps_choices = ("rock", "paper", "scissors")
+    rps_choices = ["rock", "paper", "scissors"]
     bot_choice = random.choice(rps_choices)
-    user_choice = choice.lower()
 
-    if user_choice not in rps_choices:
-        await ctx.respond(
-            "Invalid choice. Please choose either rock, paper, or scissors!",
-            ephemeral=True,
-        )
-        return
-    elif user_choice == bot_choice:
+    if choice == bot_choice:
         output = "We tied!"
-    elif user_choice == "rock" and bot_choice == "scissors":
+    elif choice == "rock" and bot_choice == "scissors":
         output = "You won!"
-    elif user_choice == "paper" and bot_choice == "rock":
+    elif choice == "paper" and bot_choice == "rock":
         output = "You won!"
-    elif user_choice == "scissors" and bot_choice == "paper":
+    elif choice == "scissors" and bot_choice == "paper":
         output = "You won!"
     else:
         output = "You lost!"
@@ -327,7 +367,7 @@ async def rps(
     await ctx.respond(embed=rps_embed)
 
 
-"""Wikipedia subgroup"""
+"""Wikipedia command group"""
 
 
 @wk.command(description="Searches for a summary in Wikipedia.")
@@ -379,7 +419,7 @@ async def summary(
         exception_embed.add_field(name=f"{search} may refer to:", value=e.options)
 
         await ctx.respond(
-            f"Oops, an error occured!", embed=exception_embed, ephemeral=True
+            "Oops, an error occured!", embed=exception_embed, ephemeral=True
         )
     except Exception as e:
         await ctx.respond(e, ephemeral=True)
@@ -391,7 +431,9 @@ async def link(ctx, query: discord.Option(str, description="The link to search f
 
     try:
         link_summary = wikipedia.summary(query, auto_suggest=False)
-        search = query.lower().replace(" ", "_").replace("  ", "_")
+        search = (
+            query.lower().replace(" ", "_").replace("  ", "_")
+        )  # Removing empty space and instead replacing it with "_" so the url is valid.
 
         wikipedia_link_embed = discord.Embed(
             title="I've got one!",
@@ -421,7 +463,7 @@ async def link(ctx, query: discord.Option(str, description="The link to search f
         exception_embed.add_field(name=f"{query} may refer to:", value=e.options)
 
         await ctx.respond(
-            f"Oops, an error occured!", embed=exception_embed, ephemeral=True
+            "Oops, an error occured!", embed=exception_embed, ephemeral=True
         )
     except Exception as e:
         await ctx.respond(e, ephemeral=True)
@@ -453,8 +495,10 @@ async def ping_ctx_menu(ctx, member: discord.Member):
 
 
 # Add the groups that we have created earlier to discord.
-bot.add_application_command(xb)
-bot.add_application_command(cfg)
+bot.add_application_command(gen)
+bot.add_application_command(game)
+bot.add_application_command(util)
+bot.add_application_command(wk)
 
 # Keep running the bot.
 keep_alive.keep_alive()

@@ -6,40 +6,33 @@ from dotenv import load_dotenv
 
 load_dotenv("C:\Programming\XnonBot\.env")
 
-waifu_tuple = (
+# The max list for choices in discord.Option is 25, we can't have all the categories sadly, I'm only putting 20 here.
+waifu_categories = [
     "waifu",
     "neko",
-    "shinobu",
     "megumin",
-    "bully",
     "cuddle",
     "cry",
     "hug",
     "awoo",
     "kiss",
-    "lick",
     "pat",
     "smug",
     "bonk",
-    "yeet",
     "blush",
     "smile",
     "wave",
     "highfive",
     "handhold",
-    "nom",
-    "bite",
-    "glomp",
     "slap",
-    "kill",
     "kick",
     "happy",
     "wink",
-    "poke",
     "dance",
-    "cringe",
-)
-trivia_list = [
+]
+
+# Only 10 for the time being.
+trivia_categories = [
     "animal",
     "anime",
     "math",
@@ -73,19 +66,13 @@ def get_cat_pic():
 
 
 def get_waifu_pic(category):
-    if category not in waifu_tuple:
-        return None
-
     waifu_response = requests.get(f"https://api.waifu.pics/sfw/{category}")
     waifu_convert_json = json.loads(waifu_response.text)
     return waifu_convert_json["url"]
 
 
-def get_trivia(category):
-    if category not in trivia_list:
-        return None
-
-    available_category = {
+def get_trivia_legacy(category):
+    available_category_true_or_false = {
         "animal": "https://opentdb.com/api.php?amount=1&category=27&type=boolean",
         "math": "https://opentdb.com/api.php?amount=1&category=19&type=boolean",
         "anime": "https://opentdb.com/api.php?amount=1&category=31&type=boolean",
@@ -97,16 +84,42 @@ def get_trivia(category):
         "sports": "https://opentdb.com/api.php?amount=1&category=21&type=boolean",
         "cartoons": "https://opentdb.com/api.php?amount=1&category=32&type=boolean",
     }
-    trivia_response = requests.get(available_category.get(category))
+
+    trivia_response = requests.get(available_category_true_or_false.get(category))
     trivia_convert_json = json.loads(trivia_response.text)
-    trivia_question = trivia_convert_json["results"][0]["question"]
-    trivia_difficulty = trivia_convert_json["results"][0]["difficulty"]
-    trivia_correct_answer = trivia_convert_json["results"][0]["correct_answer"]
-    return trivia_question, trivia_difficulty, trivia_correct_answer
+    return (
+        trivia_convert_json["results"][0]["question"],
+        trivia_convert_json["results"][0]["difficulty"],
+        trivia_convert_json["results"][0]["correct_answer"],
+    )
+
+
+def get_trivia(category):
+    available_category_multiple_answers = {
+        "animal": "https://opentdb.com/api.php?amount=1&category=27&type=multiple",
+        "math": "https://opentdb.com/api.php?amount=1&category=19&type=multiple",
+        "anime": "https://opentdb.com/api.php?amount=1&category=31&type=multiple",
+        "history": "https://opentdb.com/api.php?amount=1&category=23&type=multiple",
+        "geography": "https://opentdb.com/api.php?amount=1&category=22&type=multiple",
+        "art": "https://opentdb.com/api.php?amount=1&category=25&type=multiple",
+        "celebrity": "https://opentdb.com/api.php?amount=1&category=26&type=multiple",
+        "computers": "https://opentdb.com/api.php?amount=1&category=18&type=multiple",
+        "sports": "https://opentdb.com/api.php?amount=1&category=21&type=multiple",
+        "cartoons": "https://opentdb.com/api.php?amount=1&category=32&type=multiple",
+    }
+
+    trivia_response = requests.get(available_category_multiple_answers.get(category))
+    trivia_convert_json = json.loads(trivia_response.text)
+    return (
+        trivia_convert_json["results"][0]["question"],
+        trivia_convert_json["results"][0]["difficulty"],
+        trivia_convert_json["results"][0]["correct_answer"],
+        trivia_convert_json["results"][0]["incorrect_answers"],
+    )
 
 
 def get_pexels_photos(query):
-    pexels_client_api = API(os.environ["PEXELSAPI"])
+    pexels_client_api = API(os.requests("PEXELSAPI"))
     pexels_client_api.search(query, page=1, results_per_page=1)
     images = pexels_client_api.get_entries()
     for i in images:
