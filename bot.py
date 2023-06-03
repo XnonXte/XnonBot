@@ -14,7 +14,7 @@ version = "v0.4.4.1"
 
 intents = discord.Intents.default()
 intents.message_content = True
-bot = discord.Bot(intents=intents)
+bot = discord.Bot(command_prefix="$", intents=intents)
 
 # Command groups.
 gen = discord.SlashCommandGroup("generate", "generate related command")
@@ -132,7 +132,7 @@ async def quote(ctx):
     await ctx.respond(quote)
 
 
-@gen.command(description="Gets a random waifu picture from https://waifu.pics/docs")
+@gen.command(description="Gets a random waifu picture from waifu.pics/docs")
 async def waifu(
     ctx,
     category: discord.Option(
@@ -149,7 +149,7 @@ async def waifu(
     await ctx.respond(embed=waifu_embed)
 
 
-@gen.command(description="Gets a random dog picture from https://dog.ceo/dog-api")
+@gen.command(description="Gets a random dog picture from dog.ceo/dog-api")
 async def dog(ctx):
     dog = xnonbot_requests.get_dog_pic()
     dog_embed = discord.Embed(
@@ -161,7 +161,7 @@ async def dog(ctx):
     await ctx.respond(embed=dog_embed)
 
 
-@gen.command(description="Gets a random cat picture from https://thecatapi.com")
+@gen.command(description="Gets a random cat picture from thecatapi.com")
 async def cat(ctx):
     cat = xnonbot_requests.get_cat_pic()
     cat_embed = discord.Embed(
@@ -231,10 +231,10 @@ async def trivia(
         )
         trivia_true_or_false_embed.add_field(
             name="Question",
-            value=f"{html.unescape(trivia_requests[0])} (The difficulty is {trivia_requests[1]}).\n\nAnswers in True or False!",
+            value=f"{html.unescape(trivia_requests[0])} | Difficulty is {trivia_requests[1]}.\n\nAnswers in True or False!",
         )
         trivia_true_or_false_embed.set_footer(
-            text=f"{category[0].upper() + category[1:]} trivia - Powered by opentdb.com"  # We want the category to start with a capital letter.
+            text=f"{category} trivia - Powered by opentdb.com",  # We want the category to start with a capital letter.
         )
         trivia_true_or_false_embed.set_thumbnail(url="attachment://opentdb.png")
 
@@ -260,7 +260,7 @@ async def trivia(
                 await ctx.send("You're correct!")
             else:
                 await ctx.send(
-                    f"Sorry, but the correct answer was {trivia_requests[2]}"
+                    f"Sorry, but the correct answer was {trivia_requests[2]}."
                 )
         except asyncio.TimeoutError:
             await ctx.send(
@@ -281,10 +281,10 @@ async def trivia(
         )
         trivia_multiple_answers_embed.add_field(
             name="Question",
-            value=f"{html.unescape(trivia_requests[0])} (The difficulty is {trivia_requests[1]}).\n\n{answers_list[0]}, {answers_list[1]}, {answers_list[2]}, or {answers_list[3]}.",
+            value=f"{html.unescape(trivia_requests[0])} | Difficulty is {trivia_requests[1]}.\n\n{answers_list[0]}, {answers_list[1]}, {answers_list[2]}, or {answers_list[3]}.",
         )
         trivia_multiple_answers_embed.set_footer(
-            text=f"{category[0].upper() + category[1:]} trivia - Powered by opentdb.com"
+            text=f"{category} trivia - Powered by opentdb.com",
         )
         trivia_multiple_answers_embed.set_thumbnail(url="attachment://opentdb.png")
 
@@ -309,7 +309,7 @@ async def trivia(
                 await ctx.send("You're correct!")
             else:
                 await ctx.send(
-                    f"Sorry, but the correct answer was {trivia_requests[2]}"
+                    f"Sorry, but the correct answer was {trivia_requests[2]}."
                 )
         except asyncio.TimeoutError:
             await ctx.send(

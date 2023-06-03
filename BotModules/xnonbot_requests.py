@@ -8,41 +8,41 @@ load_dotenv("C:\Programming\XnonBot\dev.env")
 
 # The max list for choices in discord.Option is 25, we can't have all the categories sadly, I'm only putting 20 here.
 waifu_categories = [
-    "waifu",
-    "neko",
-    "megumin",
-    "cuddle",
-    "cry",
-    "hug",
-    "awoo",
-    "kiss",
-    "pat",
-    "smug",
-    "bonk",
-    "blush",
-    "smile",
-    "wave",
-    "highfive",
-    "handhold",
-    "slap",
-    "kick",
-    "happy",
-    "wink",
-    "dance",
+    "Waifu",
+    "Neko",
+    "Megumin",
+    "Cuddle",
+    "Cry",
+    "Hug",
+    "Awoo",
+    "Kiss",
+    "Pat",
+    "Smug",
+    "Bonk",
+    "Blush",
+    "Smile",
+    "Wave",
+    "Highfive",
+    "Handhold",
+    "Slap",
+    "Kick",
+    "Happy",
+    "Wink",
+    "Dance",
 ]
 
 # Only 10 for the time being.
 trivia_categories = [
-    "animal",
-    "anime",
-    "math",
-    "history",
-    "geography",
-    "art",
-    "celebrity",
-    "computers",
-    "sports",
-    "cartoons",
+    "Animal",
+    "Anime",
+    "Math",
+    "History",
+    "Geography",
+    "Art",
+    "Celebrity",
+    "Computers",
+    "Sports",
+    "Cartoons",
 ]
 
 
@@ -66,12 +66,12 @@ def get_cat_pic():
 
 
 def get_waifu_pic(category):
-    waifu_response = requests.get(f"https://api.waifu.pics/sfw/{category}")
+    waifu_response = requests.get(f"https://api.waifu.pics/sfw/{category.lower()}")
     waifu_convert_json = json.loads(waifu_response.text)
     return waifu_convert_json["url"]
 
 
-def get_trivia_legacy(category):
+def get_trivia_legacy(arg):
     available_category_true_or_false = {
         "animal": "https://opentdb.com/api.php?amount=1&category=27&type=boolean",
         "math": "https://opentdb.com/api.php?amount=1&category=19&type=boolean",
@@ -85,7 +85,7 @@ def get_trivia_legacy(category):
         "cartoons": "https://opentdb.com/api.php?amount=1&category=32&type=boolean",
     }
 
-    trivia_response = requests.get(available_category_true_or_false.get(category))
+    trivia_response = requests.get(available_category_true_or_false.get(arg.lower()))
     trivia_convert_json = json.loads(trivia_response.text)
     return (
         trivia_convert_json["results"][0]["question"],
@@ -94,7 +94,7 @@ def get_trivia_legacy(category):
     )
 
 
-def get_trivia(category):
+def get_trivia(arg):
     available_category_multiple_answers = {
         "animal": "https://opentdb.com/api.php?amount=1&category=27&type=multiple",
         "math": "https://opentdb.com/api.php?amount=1&category=19&type=multiple",
@@ -108,7 +108,7 @@ def get_trivia(category):
         "cartoons": "https://opentdb.com/api.php?amount=1&category=32&type=multiple",
     }
 
-    trivia_response = requests.get(available_category_multiple_answers.get(category))
+    trivia_response = requests.get(available_category_multiple_answers.get(arg.lower()))
     trivia_convert_json = json.loads(trivia_response.text)
     return (
         trivia_convert_json["results"][0]["question"],
