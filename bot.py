@@ -10,7 +10,7 @@ from BotModules import keep_alive, xnonbot_components, xnonbot_requests
 
 load_dotenv("C:\Programming\XnonBot\dev.env")
 
-version = "v0.4.4.1"
+version = "v0.4.4.2"
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -34,7 +34,7 @@ SLASHCOMMANDS = """
 `waifu` - Sends a random waifu picture
 `pexels` - Search for an image on pexels.com
 `trivia` - Sends a random  trivia question and asking the user whether it is True or False
-`conversion_ticks` - Converts ticks to seconds and vice versa
+`convert_tick_second` - Converts ticks to seconds and vice versa
 `ping` - Checks the bot's latency
 `gtn` - Plays a guess-the-number game
 `dadjoke` - Gets a random dad joke
@@ -46,6 +46,19 @@ SLASHCOMMANDS = """
 
 @bot.event
 async def on_ready():
+    print(
+        """
+    
+ __   __  __    _  _______  __    _  _______  _______  _______ 
+|  |_|  ||  |  | ||       ||  |  | ||  _    ||       ||       |
+|       ||   |_| ||   _   ||   |_| || |_|   ||   _   ||_     _|
+|       ||       ||  | |  ||       ||       ||  | |  |  |   |  
+ |     | |  _    ||  |_|  ||  _    ||  _   | |  |_|  |  |   |  
+|   _   || | |   ||       || | |   || |_|   ||       |  |   |  
+|__| |__||_|  |__||_______||_|  |__||_______||_______|  |___|  
+
+    """
+    )
     print(
         f"The bot is now running as {bot.user} - Visit my GitHub: https://github.com/XnonXte"
     )
@@ -107,7 +120,7 @@ async def ping(ctx):
 
 
 @util.command(description="Converts tick to second and vice versa.")
-async def conversion_ticks(
+async def convert_tick_second(
     ctx,
     value: discord.Option(float, description="Enter the value."),
     value_type: discord.Option(
